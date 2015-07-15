@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.22823.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Templatus", "src\Templatus\Templatus.fsproj", "{1A2D4FDB-650E-48C5-ABB8-A5348329811B}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Templatus.Core", "src\Templatus.Core\Templatus.Core.fsproj", "{F4A3CB74-B623-4D17-A3D3-7861CA0513F8}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1A2D4FDB-650E-48C5-ABB8-A5348329811B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1A2D4FDB-650E-48C5-ABB8-A5348329811B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1A2D4FDB-650E-48C5-ABB8-A5348329811B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1A2D4FDB-650E-48C5-ABB8-A5348329811B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F4A3CB74-B623-4D17-A3D3-7861CA0513F8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F4A3CB74-B623-4D17-A3D3-7861CA0513F8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F4A3CB74-B623-4D17-A3D3-7861CA0513F8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F4A3CB74-B623-4D17-A3D3-7861CA0513F8}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
