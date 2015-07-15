@@ -7,6 +7,16 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Templatus", "src\Templatus\
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Templatus.Core", "src\Templatus.Core\Templatus.Core.fsproj", "{F4A3CB74-B623-4D17-A3D3-7861CA0513F8}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Project files", "Project files", "{3188BB49-E4FE-4E1A-81A6-69C2449D2678}"
+	ProjectSection(SolutionItems) = preProject
+		build.cmd = build.cmd
+		build.fsx = build.fsx
+		build.sh = build.sh
+		paket.dependencies = paket.dependencies
+		paket.lock = paket.lock
+		README.md = README.md
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
