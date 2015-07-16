@@ -1,0 +1,8 @@
+﻿<#@ output filename="output.txt" #>
+Time: <# DateTime.Now.ToString() |> kprintfn #>
+
+Numbers:
+<#
+    [1 .. 10]
+    |> Seq.iter (kprintfn << sprintf "%d")
+#>
