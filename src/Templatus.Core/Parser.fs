@@ -11,7 +11,7 @@ module TemplateParser =
         charsTillString str skipString System.Int32.MaxValue
 
     let pAssemblyReference: Parser<Directive, string> =
-        skipString "assembly" >>. spaces1 >>. skipString "assembly=\"" >>. maxCharsTillString "\"" true |>> AssemblyReference
+        skipString "assembly" >>. spaces1 >>. skipString "name=\"" >>. maxCharsTillString "\"" true |>> AssemblyReference
 
     let pInclude: Parser<Directive, string> =
         skipString "include" >>. spaces1 >>. skipString "file=\"" >>. maxCharsTillString "\"" true |>> Include
@@ -19,9 +19,11 @@ module TemplateParser =
     let pOutput: Parser<Directive, string> =
         skipString "output" >>. spaces1 >>. skipString "filename=\"" >>. maxCharsTillString "\"" true |>> Output
 
+    let pAnyDirective: Parser<Directive, string> =
+        choice [ pAssemblyReference; pInclude; pOutput ]
+
     let pDirective: Parser<TemplatePart, string> =
-        let pDirectiveType = choice [ pAssemblyReference; pInclude; pOutput ]
-        skipString "<#@" >>. spaces >>. pDirectiveType .>> spaces .>> skipString "#>" |>> DirectivePart
+        skipString "<#@" >>. spaces >>. pAnyDirective .>> spaces .>> skipString "#>" |>> DirectivePart
 
     let pLiteral: Parser<TemplatePart, string> = 
         maxCharsTillString "<#" false |> attempt |>> Literal |>> LiteralPart
@@ -32,8 +34,11 @@ module TemplateParser =
     let pControl: Parser<TemplatePart, string> =
         skipString "<#" >>. maxCharsTillString "#>" true |>> Control |>> ControlPart
 
+    let pAnyTemplatePart: Parser<TemplatePart, string> =
+        choice [ pDirective; pControl; pLiteral; ]
+
     let pTemplate: Parser<TemplatePart list, string> =
-        pipe2 (many (choice [ pDirective; pControl; pLiteral; ])) pLiteralEof (fun parts lastPart -> List.append parts [lastPart])
+        pipe2 (many pAnyTemplatePart) pLiteralEof (fun parts lastPart -> List.append parts [lastPart])
 
     let parse filePath =
         match runParserOnFile pTemplate "" filePath System.Text.UTF8Encoding.UTF8 with
