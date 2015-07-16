@@ -1,10 +1,7 @@
 ﻿namespace Templatus.Core
 
 open FParsec
-
-type ParsingResult =
-    | Success of TemplatePart list
-    | Failure of string
+open Chessie.ErrorHandling
 
 module TemplateParser =
     let maxCharsTillString str skipString =
@@ -42,5 +39,5 @@ module TemplateParser =
 
     let parse filePath =
         match runParserOnFile pTemplate "" filePath System.Text.UTF8Encoding.UTF8 with
-        | ParserResult.Success (parsed, _, _) -> Success parsed
-        | ParserResult.Failure (reason, _, _) -> Failure reason
+        | ParserResult.Success (parsed, _, _) -> Ok (parsed, [])
+        | ParserResult.Failure (reason, _, _) -> Bad [reason]

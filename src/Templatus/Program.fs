@@ -1,6 +1,7 @@
 ﻿namespace Templatus
 
 open Templatus.Core
+open Chessie.ErrorHandling
 
 module Main =
     [<EntryPoint>]
@@ -8,5 +9,5 @@ module Main =
         match argv.Length with
         | 0 -> eprintfn "No file provided"; 1
         | _ -> match TemplateParser.parse argv.[0] with
-               | Success result -> printfn "%A" result; 0
-               | Failure reason -> eprintf "Template parsing failed: %s" reason; 2
+               | Ok (result, _) -> printfn "%A" result; 0
+               | Bad reasons -> eprintf "Template parsing failed: %s" reasons.Head; 2
