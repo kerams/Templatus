@@ -40,6 +40,7 @@
     <DocumentationFile>
     </DocumentationFile>
     <Prefer32Bit>true</Prefer32Bit>
+    <StartArguments>..\tests\testTemplate.txt</StartArguments>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />

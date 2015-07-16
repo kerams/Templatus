@@ -24,13 +24,16 @@ module TemplateParser =
         skipString "<#@" >>. spaces >>. pDirectiveType .>> spaces .>> skipString "#>" |>> DirectivePart
 
     let pLiteral: Parser<TemplatePart, string> = 
-        maxCharsTillString "<#" false |>> Literal |>> LiteralPart
+        maxCharsTillString "<#" false |> attempt |>> Literal |>> LiteralPart
+
+    let pLiteralEof: Parser<TemplatePart, string> =
+        manyCharsTill anyChar eof |>> Literal |>> LiteralPart
 
     let pControl: Parser<TemplatePart, string> =
         skipString "<#" >>. maxCharsTillString "#>" true |>> Control |>> ControlPart
 
     let pTemplate: Parser<TemplatePart list, string> =
-        many (choice [ pDirective; pControl; pLiteral; ]) .>> eof
+        pipe2 (many (choice [ pDirective; pControl; pLiteral; ])) pLiteralEof (fun parts lastPart -> List.append parts [lastPart])
 
     let parse filePath =
         match runParserOnFile pTemplate "" filePath System.Text.UTF8Encoding.UTF8 with

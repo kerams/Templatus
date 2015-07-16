@@ -6,3 +6,4 @@ Numbers:
     [1 .. 10]
     |> Seq.iter (kprintfn << sprintf "%d")
 #>
+END
