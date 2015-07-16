@@ -1,5 +1,8 @@
+redirects: on
 source https://nuget.org/api/v2
 
 nuget FAKE
+nuget chessie
 nuget fparsec
 nuget fsharp.compiler.service
+nuget fsharp.core
