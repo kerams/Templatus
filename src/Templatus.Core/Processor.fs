@@ -8,6 +8,10 @@ type DirectiveGrouping = {
         AssemblyReferences: string list
         Includes: string list }
 
+type ProcessedTemplate = {
+        Directives: DirectiveGrouping
+        FilteredTemplateParts: TemplatePart list }
+
 module Processor =
     let partitionDirectives templateParts =
         let rec partitionInner rest directiveGrouping =
@@ -19,15 +23,19 @@ module Processor =
                                   | AssemblyReference assembly -> { directiveGrouping with AssemblyReferences = assembly :: directiveGrouping.AssemblyReferences }
                                   | Include file -> { directiveGrouping with Includes = file :: directiveGrouping.Includes }
                 partitionInner t newGrouping
+        
+        let directives =
+            templateParts
+            |> List.choose (fun x -> match x with DirectivePart d -> Some d | _ -> None)
 
-        partitionInner templateParts { Output = []; AssemblyReferences = []; Includes = [] }
+        partitionInner directives { Output = []; AssemblyReferences = []; Includes = [] }
 
     let validateDirectiveGrouping grouping =
         let validateOutput grouping =
             match grouping.Output |> List.length with
             | 1 -> pass grouping
             | _ -> fail "Exactly one output directive needs to be specified."
-        
+
         let validateIncludes grouping =
             match grouping.Includes |> List.forall File.Exists with
             | true -> pass grouping
@@ -36,6 +44,9 @@ module Processor =
         grouping |> validateOutput >>= validateIncludes
 
     let processTemplate templateParts =
-        match partitionDirectives templateParts |> validateDirectiveGrouping with
-        | Ok _ -> ()
-        | Bad _ -> ()
+        let directiveGrouping = partitionDirectives templateParts
+        let nonDirectiveTemplateParts = templateParts |> List.choose (fun x -> match x with DirectivePart _ -> None | _ -> Some x)
+
+        match directiveGrouping |> validateDirectiveGrouping with
+        | Ok _ -> pass { Directives = directiveGrouping; FilteredTemplateParts = nonDirectiveTemplateParts }
+        | Bad reasons-> Bad reasons

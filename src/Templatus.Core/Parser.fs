@@ -39,5 +39,5 @@ module TemplateParser =
 
     let parse filePath =
         match runParserOnFile pTemplate "" filePath System.Text.UTF8Encoding.UTF8 with
-        | ParserResult.Success (parsed, _, _) -> pass parsed
-        | ParserResult.Failure (reason, _, _) -> fail reason
+        | Success (parsed, _, _) -> pass parsed
+        | Failure (reason, _, _) -> fail reason
