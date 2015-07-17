@@ -1,9 +1,9 @@
 ﻿<#@ output filename="output.txt" #>
-Time: <# DateTime.Now.ToString() |> kprintfn #>
+Time: <# DateTime.Now |> tprintf #>
 
 Numbers:
 <#
     [1 .. 10]
-    |> Seq.iter (kprintfn << sprintf "%d")
+    |> Seq.iter (tprintfn << sprintf "%d")
 #>
 END
