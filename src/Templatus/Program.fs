@@ -30,4 +30,4 @@ module Main =
 
         match doStuff with
         | Ok _ -> printfn "Aw yisss!"; 0
-        | Bad reasons -> reasons |> List.iter (eprintfn "%s"); 1
+        | Bad reasons -> reasons |> List.iter (fun r -> r.Trim() |> eprintfn "%s"); 1
