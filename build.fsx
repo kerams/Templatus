@@ -7,8 +7,6 @@ let solution = "Templatus.sln"
 
 Target "All" DoNothing
 
-Target "PackageRestore" RestorePackages
-
 Target "Clean" (fun _ ->
     CleanDirs [ buildDir ]
 )
@@ -20,7 +18,6 @@ Target "Build" (fun _ ->
 )
 
 "Clean"
-    ==> "PackageRestore"
     ==> "Build"
     ==> "All"
 
