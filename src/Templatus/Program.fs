@@ -14,8 +14,20 @@ module Main =
         | Ok (result, _) -> pass result
         | Bad reasons -> "Template parsing failed: " :: reasons |> Bad
 
+    let processParsedTemplate parsed =
+        match Processor.processTemplate parsed with
+        | Ok (result, _) -> pass result
+        | Bad reasons -> "Template processing failed: " :: reasons |> Bad
+
+    let generateOutput processed =
+        match OutputGenerator.generate processed with
+        | Ok _ -> pass ()
+        | Bad reasons -> "Output generation failed: " :: reasons |> Bad
+
     [<EntryPoint>]
     let main argv = 
-        match argv |> checkArgumentCount >>= getParsedTemplate with
-        | Ok (result, _) -> printfn "%A" result; 0
+        let doStuff = argv |> checkArgumentCount >>= getParsedTemplate >>= processParsedTemplate >>= generateOutput
+
+        match doStuff with
+        | Ok _ -> printfn "Aw yisss!"; 0
         | Bad reasons -> reasons |> List.iter (eprintfn "%s"); 1
