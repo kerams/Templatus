@@ -9,8 +9,8 @@ module OutputGenerator =
     let prep outputFileName = [
         "open System;;"
         "let templateOutputFile = new System.IO.StreamWriter \"" + outputFileName + "\";;"
-        "let tprintf object = templateOutputFile.Write <| sprintf \"%O\" object;;"
-        "let tprintfn object = templateOutputFile.WriteLine <| sprintf \"%O\" object;;" ]
+        "let tprintf o = sprintf \"%O\" o |> templateOutputFile.Write;;"
+        "let tprintfn o = sprintf \"%O\" o |> templateOutputFile.WriteLine;;" ]
 
     let finish = [ "templateOutputFile.Close ();;" ]
 
