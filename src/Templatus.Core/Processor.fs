@@ -33,12 +33,7 @@ module Processor =
             | true -> pass grouping
             | false -> fail "One or more includes cannot be found."
 
-        let validateReferences grouping =
-            match grouping.AssemblyReferences |> List.forall File.Exists with
-            | true -> pass grouping
-            | false -> fail "One or more assembly references cannot be found."
-
-        grouping |> validateOutput >>= validateIncludes >>= validateReferences
+        grouping |> validateOutput >>= validateIncludes
 
     let processTemplate templateParts =
         match partitionDirectives templateParts |> validateDirectiveGrouping with
