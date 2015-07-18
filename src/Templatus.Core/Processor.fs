@@ -24,9 +24,7 @@ module Processor =
                                   | Include file -> { directiveGrouping with Includes = file :: directiveGrouping.Includes }
                 partitionInner t newGrouping
         
-        let directives =
-            templateParts
-            |> List.choose (fun x -> match x with DirectivePart d -> Some d | _ -> None)
+        let directives = templateParts |> List.choose (fun x -> match x with DirectivePart d -> Some d | _ -> None)
 
         partitionInner directives { Output = []; AssemblyReferences = []; Includes = [] }
 

@@ -20,19 +20,25 @@ module OutputGenerator =
 
     let private prepareControl = function
         | ControlBlock block -> block.Replace("\t", "    ") // FSI complains about tabs
-        | ControlExpression expr -> expr.Replace("\t", "    ") |> sprintf "tprintf %s"
+        | ControlExpression expr -> expr.Replace("\t", "    ") |> sprintf "%s |> tprintf"
 
     let private normalizeRegex = new Regex (@"\r\n|\n\r|\n|\r", RegexOptions.Compiled)
 
     let private prepareLiteral text =
-        normalizeRegex.Replace(text, Environment.NewLine) |> sprintf "tprintf \"%s\""
+        normalizeRegex.Replace(text, Environment.NewLine).Replace(@"\", @"\\").Replace("\"", "\\\"")
+        |> sprintf "tprintf \"%s\""
 
     let private prepareTemplateForEval processedTemplate =
-        processedTemplate.FilteredTemplateParts
-        |> List.map (fun p -> match p with
-                              | LiteralPart (Literal l) -> prepareLiteral l
-                              | ControlPart c -> prepareControl c
-                              | DirectivePart _ -> failwith "DirectivePart not filtered out")
+        let assemblyReferences = processedTemplate.Directives.AssemblyReferences |> List.map (sprintf "#r @\"%s\"")
+
+        let nonDirectives =
+            processedTemplate.FilteredTemplateParts
+            |> List.map (fun p -> match p with
+                                  | LiteralPart (Literal l) -> prepareLiteral l
+                                  | ControlPart c -> prepareControl c
+                                  | DirectivePart _ -> failwith "DirectivePart not filtered out")
+
+        List.append assemblyReferences nonDirectives
 
     let generate processedTemplate =
         let sbOut = StringBuilder ()
@@ -43,8 +49,10 @@ module OutputGenerator =
 
         prep processedTemplate.Directives.Output.Head |> List.iter fsi.EvalInteraction
 
+        let preparedTemplate = prepareTemplateForEval processedTemplate
+
         try
-            processedTemplate |> prepareTemplateForEval |> List.iter fsi.EvalInteraction
+             preparedTemplate |> List.iter fsi.EvalInteraction
         with _ -> failed |> List.iter fsi.EvalInteraction
 
         finish |> List.iter fsi.EvalInteraction
