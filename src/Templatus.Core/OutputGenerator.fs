@@ -16,19 +16,22 @@ module OutputGenerator =
 
     let private finish = [ "templateOutputFile.Close ()" ]
 
-    let private prepareControlPart (text: string) =
-        text.Replace("\t", "    ") // FSI complains about tabs
+    let private failed = [ "sprintf \"%s---FAILED---\" Environment.NewLine |> tprintf" ]
+
+    let private prepareControl = function
+        | ControlBlock block -> block.Replace("\t", "    ") // FSI complains about tabs
+        | ControlExpression expr -> expr.Replace("\t", "    ") |> sprintf "tprintf %s"
 
     let private normalizeRegex = new Regex (@"\r\n|\n\r|\n|\r", RegexOptions.Compiled)
 
-    let private prepareLiteralPart text =
+    let private prepareLiteral text =
         normalizeRegex.Replace(text, Environment.NewLine) |> sprintf "tprintf \"%s\""
 
     let private prepareTemplateForEval processedTemplate =
         processedTemplate.FilteredTemplateParts
         |> List.map (fun p -> match p with
-                              | LiteralPart (Literal l) -> prepareLiteralPart l
-                              | ControlPart (Control c) -> prepareControlPart c
+                              | LiteralPart (Literal l) -> prepareLiteral l
+                              | ControlPart c -> prepareControl c
                               | DirectivePart _ -> failwith "DirectivePart not filtered out")
 
     let generate processedTemplate =
@@ -42,7 +45,7 @@ module OutputGenerator =
 
         try
             processedTemplate |> prepareTemplateForEval |> List.iter fsi.EvalInteraction
-        with _ -> ()
+        with _ -> failed |> List.iter fsi.EvalInteraction
 
         finish |> List.iter fsi.EvalInteraction
 

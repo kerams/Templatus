@@ -7,7 +7,9 @@ type Directive =
 
 type Literal = Literal of string
 
-type Control = Control of string
+type Control =
+    | ControlBlock of string
+    | ControlExpression of string
 
 type TemplatePart =
     | DirectivePart of Directive

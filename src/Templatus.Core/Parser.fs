@@ -28,11 +28,14 @@ module TemplateParser =
     let pLiteralEof: Parser<TemplatePart, string> =
         manyCharsTill anyChar eof |>> Literal |>> LiteralPart
 
-    let pControl: Parser<TemplatePart, string> =
-        skipString "<#" >>. maxCharsTillString "#>" true |>> Control |>> ControlPart
+    let pControlBlock: Parser<TemplatePart, string> =
+        skipString "<#" >>. maxCharsTillString "#>" true |>> ControlBlock |>> ControlPart
+
+    let pControlExpression: Parser<TemplatePart, string> =
+        skipString "<#=" >>. maxCharsTillString "#>" true |>> ControlExpression |>> ControlPart
 
     let pAnyTemplatePart: Parser<TemplatePart, string> =
-        choice [ pDirective; pControl; pLiteral; ]
+        choice [ pDirective; pControlExpression; pControlBlock; pLiteral; ]
 
     let pTemplate: Parser<TemplatePart list, string> =
         pipe2 (many pAnyTemplatePart) pLiteralEof (fun parts lastPart -> List.append parts [lastPart])

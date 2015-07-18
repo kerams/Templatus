@@ -1,5 +1,5 @@
 ﻿<#@ output filename="output.txt" #>
-Time: <# DateTime.Now |> tprintf #>
+Time: <#= DateTime.Nowf #>
 
 Numbers:
 <#
