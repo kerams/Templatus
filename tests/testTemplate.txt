@@ -3,6 +3,8 @@
 Time: <#= DateTime.Now #>
 Number from TestLib: <#= TestLib.Test.Number () #>
 
+<#@ include file="..\tests\include.txt" #>
+
 Numbers:
 <#
     [1 .. 10]

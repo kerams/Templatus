@@ -2,7 +2,7 @@
 
 type Directive =
     | AssemblyReference of string
-    | Include of string 
+    | Include of string
     | Output of string
 
 type Literal = Literal of string
@@ -11,7 +11,18 @@ type Control =
     | ControlBlock of string
     | ControlExpression of string
 
-type TemplatePart =
-    | DirectivePart of Directive
-    | LiteralPart of Literal
-    | ControlPart of Control
+type ParsedTemplatePart =
+    | ParsedDirective of Directive
+    | ParsedLiteral of Literal
+    | ParsedControl of Control
+
+type ProcessedTemplatePart =
+    | ProcessedLiteral of Literal
+    | ProcessedControl of Control
+    | ProcessedInclude of ProcessedTemplate
+
+and ProcessedTemplate = {
+    Name: string
+    AssemblyReferences: string list
+    Output: string
+    ProcessedTemplateParts: ProcessedTemplatePart list }

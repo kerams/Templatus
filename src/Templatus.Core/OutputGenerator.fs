@@ -29,14 +29,14 @@ module OutputGenerator =
         |> sprintf "tprintf \"%s\""
 
     let private prepareTemplateForEval processedTemplate =
-        let assemblyReferences = processedTemplate.Directives.AssemblyReferences |> List.map (sprintf "#r @\"%s\"")
+        let assemblyReferences = processedTemplate.AssemblyReferences |> List.map (sprintf "#r @\"%s\"")
 
         let nonDirectives =
-            processedTemplate.FilteredTemplateParts
+            processedTemplate.ProcessedTemplateParts
             |> List.map (fun p -> match p with
-                                  | LiteralPart (Literal l) -> prepareLiteral l
-                                  | ControlPart c -> prepareControl c
-                                  | DirectivePart _ -> failwith "DirectivePart not filtered out")
+                                  | ProcessedLiteral (Literal l) -> prepareLiteral l
+                                  | ProcessedControl c -> prepareControl c
+                                  | ProcessedInclude _ -> "tprintf \" INCLUDED \"")
 
         List.append assemblyReferences nonDirectives
 
@@ -47,7 +47,7 @@ module OutputGenerator =
         let cfg = FsiEvaluationSession.GetDefaultConfiguration()
         let fsi = FsiEvaluationSession.Create(cfg, [|"--noninteractive"|], new StringReader (""), new StringWriter (sbOut), new StringWriter (sbErr))
 
-        prep processedTemplate.Directives.Output.Head |> List.iter fsi.EvalInteraction
+        prep processedTemplate.Output |> List.iter fsi.EvalInteraction
 
         let preparedTemplate = prepareTemplateForEval processedTemplate
 

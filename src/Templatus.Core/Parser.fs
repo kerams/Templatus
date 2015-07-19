@@ -19,25 +19,25 @@ module TemplateParser =
     let pAnyDirective: Parser<Directive, string> =
         choice [ pAssemblyReference; pInclude; pOutput ]
 
-    let pDirective: Parser<TemplatePart, string> =
-        skipString "<#@" >>. spaces >>. pAnyDirective .>> spaces .>> skipString "#>" |>> DirectivePart
+    let pDirective: Parser<ParsedTemplatePart, string> =
+        skipString "<#@" >>. spaces >>. pAnyDirective .>> spaces .>> skipString "#>" |>> ParsedDirective
 
-    let pLiteral: Parser<TemplatePart, string> = 
-        maxCharsTillString "<#" false |> attempt |>> Literal |>> LiteralPart
+    let pLiteral: Parser<ParsedTemplatePart, string> = 
+        maxCharsTillString "<#" false |> attempt |>> Literal |>> ParsedLiteral
 
-    let pLiteralEof: Parser<TemplatePart, string> =
-        manyCharsTill anyChar eof |>> Literal |>> LiteralPart
+    let pLiteralEof: Parser<ParsedTemplatePart, string> =
+        manyCharsTill anyChar eof |>> Literal |>> ParsedLiteral
 
-    let pControlBlock: Parser<TemplatePart, string> =
-        skipString "<#" >>. maxCharsTillString "#>" true |>> ControlBlock |>> ControlPart
+    let pControlBlock: Parser<ParsedTemplatePart, string> =
+        skipString "<#" >>. maxCharsTillString "#>" true |>> ControlBlock |>> ParsedControl
 
-    let pControlExpression: Parser<TemplatePart, string> =
-        skipString "<#=" >>. maxCharsTillString "#>" true |>> ControlExpression |>> ControlPart
+    let pControlExpression: Parser<ParsedTemplatePart, string> =
+        skipString "<#=" >>. maxCharsTillString "#>" true |>> ControlExpression |>> ParsedControl
 
-    let pAnyTemplatePart: Parser<TemplatePart, string> =
+    let pAnyTemplatePart: Parser<ParsedTemplatePart, string> =
         choice [ pDirective; pControlExpression; pControlBlock; pLiteral; ]
 
-    let pTemplate: Parser<TemplatePart list, string> =
+    let pTemplate: Parser<ParsedTemplatePart list, string> =
         pipe2 (many pAnyTemplatePart) pLiteralEof (fun parts lastPart -> List.append parts [lastPart])
 
     let parse filePath =

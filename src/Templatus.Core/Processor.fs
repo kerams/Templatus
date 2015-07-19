@@ -3,48 +3,59 @@
 open Chessie.ErrorHandling
 open System.IO
 
-type DirectiveGrouping = {
-        Output: string list
+module Processor =
+    type DirectiveGrouping = {
+        Name: string
+        Outputs: string list
         AssemblyReferences: string list
         Includes: string list }
 
-type ProcessedTemplate = {
-        Directives: DirectiveGrouping
-        FilteredTemplateParts: TemplatePart list }
-
-module Processor =
-    let partitionDirectives templateParts =
-        let rec partitionInner rest directiveGrouping =
+    let extractDirectives templateName parsedTemplateParts =
+        let rec extract rest directiveGrouping =
             match rest with
             | [] -> directiveGrouping
             | h :: t -> 
                 let newGrouping = match h with
-                                  | Output file -> { directiveGrouping with Output = file :: directiveGrouping.Output }
+                                  | Output file -> { directiveGrouping with Outputs = file :: directiveGrouping.Outputs }
                                   | AssemblyReference assembly -> { directiveGrouping with AssemblyReferences = assembly :: directiveGrouping.AssemblyReferences }
                                   | Include file -> { directiveGrouping with Includes = file :: directiveGrouping.Includes }
-                partitionInner t newGrouping
+                extract t newGrouping
         
-        let directives = templateParts |> List.choose (fun x -> match x with DirectivePart d -> Some d | _ -> None)
+        let directives = parsedTemplateParts |> List.choose (fun x -> match x with ParsedDirective d -> Some d | _ -> None)
 
-        partitionInner directives { Output = []; AssemblyReferences = []; Includes = [] }
+        extract directives { Name = templateName; Outputs = []; AssemblyReferences = []; Includes = [] }
 
-    let validateDirectiveGrouping grouping =
-        let validateOutput grouping =
-            match grouping.Output |> List.length with
-            | 1 -> pass grouping
-            | _ -> fail "Exactly one output directive needs to be specified."
+    let processTemplate parser templateName templateParts =
+        let rec processTemplateInner templateName templateParts =
+            let directives = extractDirectives templateName templateParts
 
-        let validateIncludes grouping =
-            match grouping.Includes |> List.forall File.Exists with
-            | true -> pass grouping
-            | false -> fail "One or more includes cannot be found."
+            let nonDirectiveParts = 
+                templateParts
+                |> List.choose (fun p -> match p with
+                                         | ParsedDirective (AssemblyReference _) | ParsedDirective (Output _) -> None
+                                         | _ -> Some p)
 
-        grouping |> validateOutput >>= validateIncludes
+            let processedParts =
+                nonDirectiveParts
+                |> List.map (fun p -> match p with
+                                      | ParsedLiteral l -> ProcessedLiteral l |> pass
+                                      | ParsedControl c -> ProcessedControl c |> pass
+                                      | ParsedDirective (Include i) -> i |> parser >>= processTemplateInner (Path.GetFileName i) >>= (ProcessedInclude >> pass)
+                                      | _ -> failwith "Nope")
 
-    let processTemplate templateParts =
-        let directiveGrouping = partitionDirectives templateParts
-        let nonDirectiveTemplateParts = templateParts |> List.choose (fun x -> match x with DirectivePart _ -> None | _ -> Some x)
+            let failures =
+                processedParts
+                |> List.collect (fun e -> match e with
+                                          | Ok _ -> []
+                                          | Bad reasons -> reasons)
 
-        match directiveGrouping |> validateDirectiveGrouping with
-        | Ok _ -> pass { Directives = directiveGrouping; FilteredTemplateParts = nonDirectiveTemplateParts }
-        | Bad reasons-> Bad reasons
+            match failures.Length with
+            | 0 ->
+                { Name = templateName;
+                  AssemblyReferences = directives.AssemblyReferences;
+                  Output = directives.Outputs.Head;
+                  ProcessedTemplateParts = processedParts |> List.choose (fun p -> match p with Ok (r, _) -> Some r | _ -> None) }
+                |> pass
+            | _ -> (sprintf "Template %s: " templateName) :: failures |> Bad
+
+        processTemplateInner (Path.GetFileName templateName) templateParts

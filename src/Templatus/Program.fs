@@ -14,8 +14,8 @@ module Main =
         | Ok (result, _) -> pass result
         | Bad reasons -> "Template parsing failed: " :: reasons |> Bad
 
-    let processParsedTemplate parsed =
-        match Processor.processTemplate parsed with
+    let processParsedTemplate parser name parts =
+        match Processor.processTemplate parser name parts with
         | Ok (result, _) -> pass result
         | Bad reasons -> "Template processing failed: " :: reasons |> Bad
 
@@ -26,7 +26,7 @@ module Main =
 
     [<EntryPoint>]
     let main argv = 
-        let doStuff = argv |> checkArgumentCount >>= getParsedTemplate >>= processParsedTemplate >>= generateOutput
+        let doStuff = argv |> checkArgumentCount >>= getParsedTemplate >>= (processParsedTemplate TemplateParser.parse argv.[0]) >>= generateOutput
 
         match doStuff with
         | Ok _ -> printfn "Aw yisss!"; 0
