@@ -12,17 +12,17 @@ module Main =
     let getParsedTemplate (args: string []) =
         match TemplateParser.parse args.[0] with
         | Ok (result, _) -> pass result
-        | Bad reasons -> "Template parsing failed: " :: reasons |> Bad
+        | Bad reasons -> Bad reasons
 
     let processParsedTemplate parser name parts =
         match Processor.processTemplate parser name parts with
         | Ok (result, _) -> pass result
-        | Bad reasons -> "Template processing failed: " :: reasons |> Bad
+        | Bad reasons -> Bad reasons
 
     let generateOutput processed =
         match OutputGenerator.generate processed with
         | Ok _ -> pass ()
-        | Bad reasons -> "Output generation failed: " :: reasons |> Bad
+        | Bad reasons -> Bad reasons
 
     [<EntryPoint>]
     let main argv = 

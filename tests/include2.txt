@@ -1,0 +1,3 @@
+<#@ output filename="irrelevant" #>
+Included from include.txt
+<#@

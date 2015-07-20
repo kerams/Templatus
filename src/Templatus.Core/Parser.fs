@@ -2,6 +2,7 @@
 
 open FParsec
 open Chessie.ErrorHandling
+open System
 
 module TemplateParser =
     let maxCharsTillString str skipString =
@@ -40,7 +41,10 @@ module TemplateParser =
     let pTemplate: Parser<ParsedTemplatePart list, string> =
         pipe2 (many pAnyTemplatePart) pLiteralEof (fun parts lastPart -> List.append parts [lastPart])
 
-    let parse filePath =
-        match runParserOnFile pTemplate "" filePath System.Text.UTF8Encoding.UTF8 with
+    let parse file =
+        match runParserOnFile pTemplate "" file Text.UTF8Encoding.UTF8 with
         | Success (parsed, _, _) -> pass parsed
-        | Failure (reason, _, _) -> fail reason
+        | Failure (reason, _, _) -> reason.Split ([| "\n"; "\r\n" |], StringSplitOptions.RemoveEmptyEntries)
+                                    |> Array.toList
+                                    |> fun l -> sprintf "Template %s: " (IO.Path.GetFileName file) :: l
+                                    |> Bad

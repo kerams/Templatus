@@ -40,14 +40,14 @@ module Processor =
                 |> List.map (fun p -> match p with
                                       | ParsedLiteral l -> ProcessedLiteral l |> pass
                                       | ParsedControl c -> ProcessedControl c |> pass
-                                      | ParsedDirective (Include i) -> i |> parser >>= processTemplateInner (Path.GetFileName i) >>= (ProcessedInclude >> pass)
-                                      | _ -> failwith "Nope")
+                                      | ParsedDirective (Include i) -> i |> parser >>= processTemplateInner i >>= (ProcessedInclude >> pass)
+                                      | _ -> failwith "You should not see this.")
 
             let failures =
                 processedParts
                 |> List.collect (fun e -> match e with
                                           | Ok _ -> []
-                                          | Bad reasons -> reasons)
+                                          | Bad reasons -> reasons |> List.map ((+) "| "))
 
             match failures.Length with
             | 0 ->
@@ -56,6 +56,6 @@ module Processor =
                   Output = directives.Outputs.Head;
                   ProcessedTemplateParts = processedParts |> List.choose (fun p -> match p with Ok (r, _) -> Some r | _ -> None) }
                 |> pass
-            | _ -> (sprintf "Template %s: " templateName) :: failures |> Bad
+            | _ -> sprintf "Template %s: " templateName :: failures |> Bad
 
         processTemplateInner (Path.GetFileName templateName) templateParts
