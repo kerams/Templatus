@@ -1,1 +1,3 @@
 <#@ output filename="oops" #>
+A line in include
+Time in include: <#= DateTime.Now #>

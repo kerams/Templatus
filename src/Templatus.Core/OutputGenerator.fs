@@ -28,17 +28,18 @@ module OutputGenerator =
         normalizeRegex.Replace(text, Environment.NewLine).Replace(@"\", @"\\").Replace("\"", "\\\"")
         |> sprintf "tprintf \"%s\""
 
-    let private prepareTemplateForEval processedTemplate =
+    let rec private prepareTemplateForEval processedTemplate =
         let assemblyReferences = processedTemplate.AssemblyReferences |> List.map (sprintf "#r @\"%s\"")
 
-        let nonDirectives =
+        let toEval =
             processedTemplate.ProcessedTemplateParts
             |> List.map (fun p -> match p with
-                                  | ProcessedLiteral (Literal l) -> prepareLiteral l
-                                  | ProcessedControl c -> prepareControl c
-                                  | ProcessedInclude _ -> "tprintf \" INCLUDED \"")
+                                  | ProcessedLiteral (Literal l) -> [prepareLiteral l]
+                                  | ProcessedControl c -> [prepareControl c]
+                                  | ProcessedInclude i -> prepareTemplateForEval i)
+            |> List.concat
 
-        List.append assemblyReferences nonDirectives
+        List.append assemblyReferences toEval
 
     let generate processedTemplate =
         let sbOut = StringBuilder ()
