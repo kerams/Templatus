@@ -50,10 +50,13 @@ module OutputGenerator =
 
         prep processedTemplate.Output |> List.iter fsi.EvalInteraction
 
-        let preparedTemplate = prepareTemplateForEval processedTemplate
+        let preparedTemplate = prepareTemplateForEval processedTemplate |> List.toArray
 
+        let currInstr = ref 0; 
         try
-             preparedTemplate |> List.iter fsi.EvalInteraction
+             preparedTemplate
+             |> Array.iter (fun x -> x |> fsi.EvalInteraction
+                                     incr currInstr)
         with _ -> failed |> List.iter fsi.EvalInteraction
 
         finish |> List.iter fsi.EvalInteraction
@@ -62,4 +65,4 @@ module OutputGenerator =
 
         match errors.Length with
         | 0 -> pass ()
-        | _ -> fail errors
+        | _ -> sprintf "Expression: %s\n%s" preparedTemplate.[!currInstr] (errors.Trim()) |> fail
