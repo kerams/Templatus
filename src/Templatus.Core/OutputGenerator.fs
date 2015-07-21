@@ -22,11 +22,11 @@ module OutputGenerator =
         | ControlBlock block -> block.Replace("\t", "    ") // FSI complains about tabs
         | ControlExpression expr -> expr.Replace("\t", "    ") |> sprintf "%s |> tprintf"
 
-    let private normalizeRegex = new Regex (@"\r\n|\n\r|\n|\r", RegexOptions.Compiled)
+    let private newlineRegex = new Regex (@"\r\n|\n\r|\n|\r", RegexOptions.Compiled)
 
     let private prepareLiteral text =
-        normalizeRegex.Replace(text, Environment.NewLine).Replace(@"\", @"\\").Replace("\"", "\\\"")
-        |> sprintf "tprintf \"%s\""
+        newlineRegex.Replace(text, Environment.NewLine).Replace("\"", "\"\"")
+        |> sprintf "tprintf @\"%s\""
 
     let rec private prepareTemplateForEval processedTemplate =
         let assemblyReferences = processedTemplate.AssemblyReferences |> List.map (sprintf "#r @\"%s\"")
@@ -48,21 +48,23 @@ module OutputGenerator =
         let cfg = FsiEvaluationSession.GetDefaultConfiguration()
         let fsi = FsiEvaluationSession.Create(cfg, [|"--noninteractive"|], new StringReader (""), new StringWriter (sbOut), new StringWriter (sbErr))
 
-        prep processedTemplate.Output |> List.iter fsi.EvalInteraction
+        match processedTemplate.OutputFile with
+        | None -> fail "No output file specified."
+        | Some f ->
+            prep f |> List.iter fsi.EvalInteraction
 
-        let preparedTemplate = prepareTemplateForEval processedTemplate |> List.toArray
+            let preparedTemplate = prepareTemplateForEval processedTemplate |> List.toArray
+            let currExpr = ref 0;
 
-        let currInstr = ref 0; 
-        try
-             preparedTemplate
-             |> Array.iter (fun x -> x |> fsi.EvalInteraction
-                                     incr currInstr)
-        with _ -> failed |> List.iter fsi.EvalInteraction
+            try
+                preparedTemplate
+                |> Array.iter (fun x -> x |> fsi.EvalInteraction
+                                        incr currExpr)
+            with _ -> failed |> List.iter fsi.EvalInteraction
 
-        finish |> List.iter fsi.EvalInteraction
+            finish |> List.iter fsi.EvalInteraction
+            let errors = sbErr.ToString().Trim()
 
-        let errors = sbErr.ToString ()
-
-        match errors.Length with
-        | 0 -> pass ()
-        | _ -> sprintf "Expression: %s\n%s" preparedTemplate.[!currInstr] (errors.Trim()) |> fail
+            if String.IsNullOrEmpty errors
+            then pass ()
+            else sprintf "Expression: %s\n%s" preparedTemplate.[!currExpr] errors |> fail

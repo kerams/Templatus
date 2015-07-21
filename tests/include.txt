@@ -1,4 +1,3 @@
-<#@ output filename="oops" #>
 A line in include
 Time in include: <#= DateTime.Now #>
 <#@ include file="..\tests\include2.txt" #>

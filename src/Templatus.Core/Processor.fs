@@ -5,29 +5,28 @@ open System.IO
 
 module Processor =
     type DirectiveGrouping = {
-        Name: string
-        Outputs: string list
+        OutputFile: string option
         AssemblyReferences: string list
         Includes: string list }
 
-    let extractDirectives templateName parsedTemplateParts =
+    let extractDirectives parsedTemplateParts =
         let rec extract rest directiveGrouping =
             match rest with
             | [] -> directiveGrouping
             | h :: t -> 
                 let newGrouping = match h with
-                                  | Output file -> { directiveGrouping with Outputs = file :: directiveGrouping.Outputs }
+                                  | Output file -> { directiveGrouping with OutputFile = Some file }
                                   | AssemblyReference assembly -> { directiveGrouping with AssemblyReferences = assembly :: directiveGrouping.AssemblyReferences }
                                   | Include file -> { directiveGrouping with Includes = file :: directiveGrouping.Includes }
                 extract t newGrouping
         
         let directives = parsedTemplateParts |> List.choose (fun x -> match x with ParsedDirective d -> Some d | _ -> None)
 
-        extract directives { Name = templateName; Outputs = []; AssemblyReferences = []; Includes = [] }
+        extract directives { OutputFile = None; AssemblyReferences = []; Includes = [] }
 
     let processTemplate parser templateName templateParts =
         let rec processTemplateInner templateName templateParts =
-            let directives = extractDirectives templateName templateParts
+            let directives = extractDirectives templateParts
 
             let nonDirectiveParts = 
                 templateParts
@@ -53,7 +52,7 @@ module Processor =
             | 0 ->
                 { Name = templateName;
                   AssemblyReferences = directives.AssemblyReferences;
-                  Output = directives.Outputs.Head;
+                  OutputFile = directives.OutputFile;
                   ProcessedTemplateParts = processedParts |> List.choose (fun p -> match p with Ok (r, _) -> Some r | _ -> None) }
                 |> pass
             | _ -> sprintf "Template %s: " templateName :: failures |> Bad

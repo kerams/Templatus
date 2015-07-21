@@ -24,5 +24,5 @@ type ProcessedTemplatePart =
 and ProcessedTemplate = {
     Name: string
     AssemblyReferences: string list
-    Output: string
+    OutputFile: string option
     ProcessedTemplateParts: ProcessedTemplatePart list }
