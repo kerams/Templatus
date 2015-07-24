@@ -24,6 +24,10 @@ module OutputGenerator =
 
     let private newlineRegex = new Regex (@"\r\n|\n\r|\n|\r", RegexOptions.Compiled)
 
+    let private fsiStripperRegex = new Regex(@"input\.fsx\(\d+,\d+\):\s*")
+
+    let private trimFsiErrors input = fsiStripperRegex.Replace(input.ToString().Trim(), "")
+
     let private prepareLiteral text =
         newlineRegex.Replace(text, Environment.NewLine).Replace("\"", "\"\"")
         |> sprintf "tprintf @\"%s\""
@@ -66,4 +70,4 @@ module OutputGenerator =
 
             if !lastExpr = Array.length preparedTemplate
             then pass ()
-            else sprintf "Expression: %s\n%s" preparedTemplate.[!lastExpr] (sbErr.ToString().Trim()) |> fail
+            else sprintf "Expression: %s\n\n%s\n" preparedTemplate.[!lastExpr] (sbErr |> trimFsiErrors) |> fail
