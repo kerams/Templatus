@@ -54,17 +54,16 @@ module OutputGenerator =
             prep f |> List.iter fsi.EvalInteraction
 
             let preparedTemplate = prepareTemplateForEval processedTemplate |> List.toArray
-            let currExpr = ref 0;
+            let lastExpr = ref 0;
 
             try
                 preparedTemplate
                 |> Array.iter (fun x -> x |> fsi.EvalInteraction
-                                        incr currExpr)
+                                        incr lastExpr)
             with _ -> failed |> List.iter fsi.EvalInteraction
 
             finish |> List.iter fsi.EvalInteraction
-            let errors = sbErr.ToString().Trim()
 
-            if String.IsNullOrEmpty errors
+            if !lastExpr = Array.length preparedTemplate
             then pass ()
-            else sprintf "Expression: %s\n%s" preparedTemplate.[!currExpr] errors |> fail
+            else sprintf "Expression: %s\n%s" preparedTemplate.[!lastExpr] (sbErr.ToString().Trim()) |> fail
