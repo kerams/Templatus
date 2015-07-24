@@ -15,9 +15,9 @@ module Processor =
             | [] -> directiveGrouping
             | h :: t -> 
                 let newGrouping = match h with
+                                  | Include file -> { directiveGrouping with Includes = file :: directiveGrouping.Includes }
                                   | Output file -> { directiveGrouping with OutputFile = Some file }
                                   | AssemblyReference assembly -> { directiveGrouping with AssemblyReferences = assembly :: directiveGrouping.AssemblyReferences }
-                                  | Include file -> { directiveGrouping with Includes = file :: directiveGrouping.Includes }
                 extract t newGrouping
         
         let directives = parsedTemplateParts |> List.choose (fun x -> match x with ParsedDirective d -> Some d | _ -> None)
