@@ -45,7 +45,7 @@ module OutputGenerator =
 
         List.append assemblyReferences toEval
 
-    let generate processedTemplate =
+    let generate templateParameters processedTemplate =
         let sbOut = StringBuilder ()
         let sbErr = StringBuilder ()
 

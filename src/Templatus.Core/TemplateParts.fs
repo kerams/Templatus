@@ -16,6 +16,10 @@ type ParsedTemplatePart =
     | ParsedLiteral of Literal
     | ParsedControl of Control
 
+type ParsedTemplate = {
+    Name: string
+    ParsedTemplateParts: ParsedTemplatePart list }
+
 type ProcessedTemplatePart =
     | ProcessedLiteral of Literal
     | ProcessedControl of Control

@@ -1,7 +1,6 @@
 ﻿namespace Templatus.Core
 
 open Chessie.ErrorHandling
-open System.IO
 
 module Processor =
     type DirectiveGrouping = {
@@ -24,12 +23,12 @@ module Processor =
 
         extract directives { OutputFile = None; AssemblyReferences = []; Includes = [] }
 
-    let processTemplate parser templateName templateParts =
-        let rec processTemplateInner templateName templateParts =
-            let directives = extractDirectives templateParts
+    let processTemplate parser parsedTemplate =
+        let rec processTemplateInner parsedTemplate =
+            let directives = extractDirectives parsedTemplate.ParsedTemplateParts
 
             let nonDirectiveParts = 
-                templateParts
+                parsedTemplate.ParsedTemplateParts
                 |> List.choose (fun p -> match p with
                                          | ParsedDirective (AssemblyReference _) | ParsedDirective (Output _) -> None
                                          | _ -> Some p)
@@ -39,7 +38,7 @@ module Processor =
                 |> List.map (fun p -> match p with
                                       | ParsedLiteral l -> ProcessedLiteral l |> pass
                                       | ParsedControl c -> ProcessedControl c |> pass
-                                      | ParsedDirective (Include i) -> i |> parser >>= processTemplateInner i >>= (ProcessedInclude >> pass)
+                                      | ParsedDirective (Include i) -> i |> parser >>= processTemplateInner >>= (ProcessedInclude >> pass)
                                       | _ -> failwith "You should not see this.")
 
             let failures =
@@ -50,11 +49,11 @@ module Processor =
 
             match failures.Length with
             | 0 ->
-                { Name = templateName;
+                { Name = parsedTemplate.Name;
                   AssemblyReferences = directives.AssemblyReferences;
                   OutputFile = directives.OutputFile;
                   ProcessedTemplateParts = processedParts |> List.choose (fun p -> match p with Ok (r, _) -> Some r | _ -> None) }
                 |> pass
-            | _ -> sprintf "Template %s: " templateName :: failures |> Bad
+            | _ -> sprintf "Template %s: " parsedTemplate.Name :: failures |> Bad
 
-        processTemplateInner (Path.GetFileName templateName) templateParts
+        processTemplateInner parsedTemplate

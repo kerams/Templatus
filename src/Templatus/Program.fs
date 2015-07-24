@@ -2,31 +2,40 @@
 
 open Templatus.Core
 open Chessie.ErrorHandling
+open Nessos.UnionArgParser
+
+type Args =
+    | [<AltCommandLine("-t")>] Template of string
+    | [<CustomCommandLine("--params")>][<AltCommandLine("-p")>] TemplateParameters of string
+with
+    interface IArgParserTemplate with
+        member s.Usage =
+            match s with
+            | Template _ -> "path to the template to process"
+            | TemplateParameters _ -> "parameters to pass in the template, i.e. --params age:3|name:Timmy"
 
 module Main =
-    let checkArgumentCount args =
-        match Array.length args with
-        | 0 -> fail "No file provided."
-        | _ -> pass args
+    let getTemplateName (parsedArgs: ArgParseResults<Args>) =
+        match parsedArgs.TryGetResult <@ Template @> with
+        | Some s -> pass s
+        | None -> parsedArgs.Usage (message = "No template provided.\nUsage:") |> fail
 
-    let getParsedTemplate (args: string []) =
-        match TemplateParser.parse args.[0] with
-        | Ok (result, _) -> pass result
-        | Bad reasons -> Bad reasons
-
-    let processParsedTemplate parser name parts =
-        match Processor.processTemplate parser name parts with
-        | Ok (result, _) -> pass result
-        | Bad reasons -> Bad reasons
-
-    let generateOutput processed =
-        match OutputGenerator.generate processed with
-        | Ok _ -> pass ()
-        | Bad reasons -> Bad reasons
+    let getTemplateParameters (parsedArgs: ArgParseResults<Args>) =
+        match parsedArgs.TryGetResult <@ TemplateParameters @> with
+        | Some parameters -> parameters.Split '|'
+                             |> List.ofArray
+                             |> List.map (fun p -> p.Split ':')
+                             |> List.map (fun ps -> ps.[0], ps.[1]) // TODO make sure this does not blow up
+        | None -> []
 
     [<EntryPoint>]
-    let main argv = 
-        let doStuff = argv |> checkArgumentCount >>= getParsedTemplate >>= (processParsedTemplate TemplateParser.parse argv.[0]) >>= generateOutput
+    let main argv =
+        let results = UnionArgParser.Create<Args>().Parse(inputs = argv, ignoreUnrecognized = true, raiseOnUsage = false)
+
+        let doStuff = results |> getTemplateName
+                      >>= TemplateParser.parse
+                      >>= Processor.processTemplate TemplateParser.parse
+                      >>= OutputGenerator.generate (getTemplateParameters results)
 
         match doStuff with
         | Ok _ -> printfn "Aw yisss!"; 0

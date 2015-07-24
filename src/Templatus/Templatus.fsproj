@@ -27,7 +27,7 @@
     <DocumentationFile>
     </DocumentationFile>
     <Prefer32Bit>true</Prefer32Bit>
-    <StartArguments>..\tests\testTemplate.txt</StartArguments>
+    <StartArguments>-t "..\tests\testTemplate.txt"</StartArguments>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
