@@ -8,11 +8,16 @@ open Chessie.ErrorHandling
 open Microsoft.FSharp.Compiler.Interactive.Shell
 
 module OutputGenerator =
-    let private prep outputFileName = [
-        "open System"
-        "let templateOutputFile = new System.IO.StreamWriter \"" + outputFileName + "\""
-        "let tprintf o = sprintf \"%O\" o |> templateOutputFile.Write"
-        "let tprintfn o = sprintf \"%O\" o |> templateOutputFile.WriteLine" ]
+    let private prep outputFileName templateParameters =
+        let basis = [
+            "open System"
+            "let templateOutputFile = new System.IO.StreamWriter \"" + outputFileName + "\""
+            "let tprintf o = sprintf \"%O\" o |> templateOutputFile.Write"
+            "let tprintfn o = sprintf \"%O\" o |> templateOutputFile.WriteLine" ]
+
+        let parameters = templateParameters |> List.map (fun (name, value) -> sprintf "let %s = \"%s\"" name value)
+
+        List.append basis parameters
 
     let private finish = [ "templateOutputFile.Close ()" ]
 
@@ -55,7 +60,7 @@ module OutputGenerator =
         match processedTemplate.OutputFile with
         | None -> fail "No output file specified."
         | Some f ->
-            prep f |> List.iter fsi.EvalInteraction
+            prep f templateParameters |> List.iter fsi.EvalInteraction
 
             let preparedTemplate = prepareTemplateForEval processedTemplate |> List.toArray
             let lastExpr = ref 0;

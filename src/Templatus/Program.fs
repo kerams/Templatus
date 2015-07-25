@@ -12,7 +12,7 @@ with
         member s.Usage =
             match s with
             | Template _ -> "path to the template to process"
-            | TemplateParameters _ -> "parameters to pass in the template, i.e. --params age:3|name:Timmy"
+            | TemplateParameters _ -> "parameters to pass in the template, i.e. --params age=3;name=Timmy"
 
 module Main =
     let getTemplateName (parsedArgs: ArgParseResults<Args>) =
@@ -22,9 +22,9 @@ module Main =
 
     let getTemplateParameters (parsedArgs: ArgParseResults<Args>) =
         match parsedArgs.TryGetResult <@ TemplateParameters @> with
-        | Some parameters -> parameters.Split '|'
+        | Some parameters -> parameters.Split ';'
                              |> List.ofArray
-                             |> List.map (fun p -> p.Split ':')
+                             |> List.map (fun p -> p.Split '=')
                              |> List.map (fun ps -> ps.[0], ps.[1]) // TODO make sure this does not blow up
         | None -> []
 

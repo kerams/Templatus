@@ -4,6 +4,8 @@ Time: <#= DateTime.Now #>
 Number from TestLib: <#= TestLib.Test.Number () #>
 \"
 
+Params: <#= sprintf "Name: %s, Age: %s" name age #>
+
 <#@ include file="..\tests\include.txt" #>
 Numbers:
 <#
