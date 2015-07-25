@@ -25,7 +25,7 @@ module Main =
         | Some parameters -> parameters.Split ';'
                              |> List.ofArray
                              |> List.map (fun p -> p.Split '=')
-                             |> List.map (fun ps -> ps.[0], ps.[1]) // TODO make sure this does not blow up
+                             |> List.choose (fun ps -> if ps.Length <> 2 then None else Some (ps.[0], ps.[1]))
         | None -> []
 
     [<EntryPoint>]
