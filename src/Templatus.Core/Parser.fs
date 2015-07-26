@@ -21,7 +21,7 @@ module TemplateParser =
         choice [ pAssemblyReference; pInclude; pOutput ]
 
     let pDirective: Parser<ParsedTemplatePart, string> =
-        skipString "<#@" >>. spaces >>. pAnyDirective .>> spaces .>> skipString "#>" |>> ParsedDirective
+        skipString "<#@" >>. spaces >>. pAnyDirective .>> spaces .>> skipString "#>" .>> optional newline |>> ParsedDirective
 
     let pLiteral: Parser<ParsedTemplatePart, string> = 
         maxCharsTillString "<#" false |> attempt |>> Literal |>> ParsedLiteral
