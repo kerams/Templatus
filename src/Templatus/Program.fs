@@ -32,11 +32,11 @@ module Main =
     let main _ =
         let results = UnionArgParser.Create<Args>().Parse(ignoreUnrecognized = true, raiseOnUsage = false)
 
-        let doStuff = results |> getTemplateName
-                      >>= TemplateParser.parse
-                      >>= Processor.processTemplate TemplateParser.parse
-                      >>= OutputGenerator.generate (getTemplateParameters results)
+        let createOutput = results |> getTemplateName
+                           >>= TemplateParser.parse
+                           >>= Processor.processTemplate TemplateParser.parse
+                           >>= OutputGenerator.generate (getTemplateParameters results)
 
-        match doStuff with
-        | Ok _ -> printfn "Aw yisss!"; 0
+        match createOutput with
+        | Ok _ -> 0
         | Bad reasons -> reasons |> List.iter (eprintfn "%s"); 1

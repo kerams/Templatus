@@ -39,7 +39,7 @@ module Processor =
                                       | ParsedLiteral l -> ProcessedLiteral l |> pass
                                       | ParsedControl c -> ProcessedControl c |> pass
                                       | ParsedDirective (Include i) -> i |> parser >>= processTemplateInner >>= (ProcessedInclude >> pass)
-                                      | _ -> failwith "You should not see this.")
+                                      | _ -> failwith "Non-iclude directives sneaked in.")
 
             let failures =
                 processedParts

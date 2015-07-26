@@ -16,15 +16,15 @@ module OutputGenerator =
             "let pushIndent str = _indent := str :: !_indent"
             "let popIndent () = _indent := match !_indent with [] -> [] | _ :: t -> t"
             "let clearIndent () = _indent := []"
-            "let templateOutputFile = new System.IO.StreamWriter \"" + outputFileName + "\""
-            "let tprintf o = sprintf \"%O\" o |> templateOutputFile.Write"
-            "let tprintfn o = sprintf \"%s%O\" (_indentStr ()) o |> templateOutputFile.WriteLine" ]
+            "let _output = new IO.StreamWriter \"" + outputFileName + "\""
+            "let tprintf o = sprintf \"%O\" o |> _output.Write"
+            "let tprintfn o = sprintf \"%s%O\" (_indentStr ()) o |> _output.WriteLine" ]
 
         let parameters = templateParameters |> List.map (fun (name, value) -> sprintf "let %s = \"%s\"" name value)
 
         List.append basis parameters
 
-    let private finish = [ "templateOutputFile.Close ()" ]
+    let private finish = [ "_output.Close ()" ]
 
     let private failed = [ "sprintf \"%s---FAILED---\" Environment.NewLine |> tprintf" ]
 
