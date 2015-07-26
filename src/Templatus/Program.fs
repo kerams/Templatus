@@ -29,8 +29,8 @@ module Main =
         | None -> []
 
     [<EntryPoint>]
-    let main argv =
-        let results = UnionArgParser.Create<Args>().Parse(inputs = argv, ignoreUnrecognized = true, raiseOnUsage = false)
+    let main _ =
+        let results = UnionArgParser.Create<Args>().Parse(ignoreUnrecognized = true, raiseOnUsage = false)
 
         let doStuff = results |> getTemplateName
                       >>= TemplateParser.parse

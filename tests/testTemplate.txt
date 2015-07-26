@@ -7,9 +7,15 @@ Number from TestLib: <#= TestLib.Test.Number () #>
 Params: <#= sprintf "Name: %s, Age: %s" name age #>
 
 <#@ include file="..\tests\include.txt" #>
-Numbers:
+Indented numbers:
 <#
     [1 .. 10]
-    |> Seq.iter (tprintfn << sprintf "%d")
+    |> Seq.iter (fun num -> pushIndent " "; sprintf "%d" num |> tprintfn)
+
+	[9 .. -1 .. 1]
+    |> Seq.iter (fun num -> popIndent (); sprintf "%d" num |> tprintfn)
+
+	clearIndent ()
+	tprintfn "----"
 #>
 "END" \

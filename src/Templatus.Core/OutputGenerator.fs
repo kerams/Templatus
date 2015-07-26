@@ -11,9 +11,14 @@ module OutputGenerator =
     let private prep outputFileName templateParameters =
         let basis = [
             "open System"
+            "let _indent: string list ref = ref []"
+            "let _indentStr () = !_indent |> List.fold (fun state curr -> curr + state) \"\""
+            "let pushIndent str = _indent := str :: !_indent"
+            "let popIndent () = _indent := match !_indent with [] -> [] | _ :: t -> t"
+            "let clearIndent () = _indent := []"
             "let templateOutputFile = new System.IO.StreamWriter \"" + outputFileName + "\""
             "let tprintf o = sprintf \"%O\" o |> templateOutputFile.Write"
-            "let tprintfn o = sprintf \"%O\" o |> templateOutputFile.WriteLine" ]
+            "let tprintfn o = sprintf \"%s%O\" (_indentStr ()) o |> templateOutputFile.WriteLine" ]
 
         let parameters = templateParameters |> List.map (fun (name, value) -> sprintf "let %s = \"%s\"" name value)
 
