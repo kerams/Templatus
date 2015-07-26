@@ -6,4 +6,5 @@ nuget chessie
 nuget fparsec
 nuget fsharp.compiler.service
 nuget fsharp.core
+nuget ilrepack
 nuget unionargparser
