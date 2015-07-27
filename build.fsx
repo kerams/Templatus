@@ -6,7 +6,7 @@ open Fake.AssemblyInfoFile
 open System
 open ReleaseNotesHelper
 
-let commitHash = Information.getCurrentSHA1 (@".\")
+let commitHash = Information.getCurrentSHA1 (".")
 let release = LoadReleaseNotes "RELEASE_NOTES.md"
 
 let buildDir = "bin"

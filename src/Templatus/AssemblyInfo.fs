@@ -8,7 +8,7 @@ open System.Runtime.InteropServices
 [<assembly: AssemblyDescriptionAttribute("T4-like templating tool")>]
 [<assembly: AssemblyVersionAttribute("0.1")>]
 [<assembly: AssemblyFileVersionAttribute("0.1")>]
-[<assembly: AssemblyMetadataAttribute("githash","06a8636b7a8f76f841f826b55c5742856f1fc421")>]
+[<assembly: AssemblyMetadataAttribute("githash","def613d855f17c3f08048baf4ce62139a6e4bba9")>]
 do ()
 
 module internal AssemblyVersionInformation =
