@@ -1,13 +1,36 @@
 #r @"packages/FAKE/tools/FakeLib.dll"
 
 open Fake
+open Fake.Git
+open Fake.AssemblyInfoFile
 open System
+open ReleaseNotesHelper
+
+let commitHash = Information.getCurrentSHA1 (@".\")
+let release = LoadReleaseNotes "RELEASE_NOTES.md"
 
 let buildDir = "bin"
 let mergeDir = "merge"
 let solution = "Templatus.sln"
 
-Target "All" DoNothing
+Target "Default" DoNothing
+
+Target "SetAssemblyInfo" (fun _ ->
+    let commonAttributes = [
+        Attribute.Product "Templatus"
+        Attribute.Description "T4-like templating tool"
+        Attribute.Version release.AssemblyVersion
+        Attribute.FileVersion release.AssemblyVersion
+        Attribute.Metadata("githash", commitHash) ]
+
+    CreateFSharpAssemblyInfo (currentDirectory @@ "src" @@ "Templatus" @@ "AssemblyInfo.fs")
+        ([ Attribute.Title "Templatus command line"
+           Attribute.Guid "1a2d4fdb-650e-48c5-abb8-a5348329811b" ] @ commonAttributes)
+    
+    CreateFSharpAssemblyInfo (currentDirectory @@ "src" @@ "Templatus.Core" @@ "AssemblyInfo.fs")
+        ([ Attribute.Title "Templatus lib"
+           Attribute.Guid "f4a3cb74-b623-4d17-a3d3-7861ca0513f8" ] @ commonAttributes)
+)
 
 Target "Clean" (fun _ ->
     CleanDirs [ buildDir; mergeDir ]
@@ -30,15 +53,16 @@ Target "Merge" (fun _ ->
     let result =
         ExecProcess
             (fun info -> info.FileName <- currentDirectory @@ "packages" @@ "ILRepack" @@ "tools" @@ "ILRepack.exe"
-                         info.Arguments <- sprintf "/verbose /lib:%s /out:%s %s" buildDir (mergeDir @@ "Templatus.exe") toPack)
+                         info.Arguments <- sprintf "/verbose /attr:%s /lib:%s /out:%s %s" (currentDirectory @@ "bin" @@ "Templatus.exe") buildDir (mergeDir @@ "Templatus.exe") toPack)
             (TimeSpan.FromMinutes 5.)
 
     if result <> 0 then failwith "Error during ILRepack execution."
 )
 
 "Clean"
+    ==> "SetAssemblyInfo"
     ==> "Build"
     ==> "Merge"
-    ==> "All"
+    ==> "Default"
 
-RunTargetOrDefault "All"
+RunTargetOrDefault "Default"
