@@ -8,17 +8,22 @@ open ReleaseNotesHelper
 
 let commitHash = Information.getCurrentSHA1 (".")
 let release = LoadReleaseNotes "RELEASE_NOTES.md"
+let authors = [ "kerams" ]
+let description = "T4-like templating tool with support for F#"
 
 let buildDir = "bin"
 let mergeDir = "merge"
+let nugetDir = "nuget"
 let solution = "Templatus.sln"
 
-Target "Default" DoNothing
+Target "Clean" (fun _ ->
+    CleanDirs [ buildDir; mergeDir ]
+)
 
 Target "SetAssemblyInfo" (fun _ ->
     let commonAttributes = [
         Attribute.Product "Templatus"
-        Attribute.Description "T4-like templating tool"
+        Attribute.Description description
         Attribute.Version release.AssemblyVersion
         Attribute.FileVersion release.AssemblyVersion
         Attribute.Metadata("githash", commitHash) ]
@@ -30,10 +35,6 @@ Target "SetAssemblyInfo" (fun _ ->
     CreateFSharpAssemblyInfo (currentDirectory @@ "src" @@ "Templatus.Core" @@ "AssemblyInfo.fs")
         ([ Attribute.Title "Templatus lib"
            Attribute.Guid "f4a3cb74-b623-4d17-a3d3-7861ca0513f8" ] @ commonAttributes)
-)
-
-Target "Clean" (fun _ ->
-    CleanDirs [ buildDir; mergeDir ]
 )
 
 Target "Build" (fun _ ->
@@ -59,10 +60,28 @@ Target "Merge" (fun _ ->
     if result <> 0 then failwith "Error during ILRepack execution."
 )
 
+Target "Default" DoNothing
+
+Target "CreateNuget" (fun _ ->
+    Paket.Pack (fun p ->
+        { p with
+            Version = release.NugetVersion
+            ReleaseNotes = toLines release.Notes
+            OutputPath = nugetDir })
+)
+
+Target "PublishNuget" (fun _ ->
+    Paket.Push (fun p ->
+        { p with
+            WorkingDir = nugetDir })
+)
+
 "Clean"
     ==> "SetAssemblyInfo"
     ==> "Build"
     ==> "Merge"
     ==> "Default"
+    =?> ("CreateNuget", not isLinux)
+    =?> ("PublishNuget", not isLinux)
 
 RunTargetOrDefault "Default"

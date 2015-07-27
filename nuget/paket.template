@@ -1,0 +1,19 @@
+type file
+id Templatus
+name Templatus
+description
+    A T4-like templating tool with support for F#.
+version
+    0.1
+authors
+    kerams
+releasenotes
+    Initial version
+summary
+    A T4-like templating tool with support for F#.
+licenseurl https://github.com/kerams/Templatus/blob/master/LICENSE
+projecturl https://github.com/kerams/Templatus
+tags
+    template, F#, tool
+files
+    ../merge/Templatus.exe ==> tools
