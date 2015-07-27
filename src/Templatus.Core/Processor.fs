@@ -38,7 +38,7 @@ module Processor =
                 |> List.map (fun p -> match p with
                                       | ParsedLiteral l -> ProcessedLiteral l |> pass
                                       | ParsedControl c -> ProcessedControl c |> pass
-                                      | ParsedDirective (Include i) -> i |> parser >>= processTemplateInner >>= (ProcessedInclude >> pass)
+                                      | ParsedDirective (Include i) -> i |> Utils.checkTemplateExists >>= parser >>= processTemplateInner >>= (ProcessedInclude >> pass)
                                       | _ -> failwith "Non-iclude directives sneaked in.")
 
             let failures =

@@ -33,6 +33,7 @@ module Main =
         let results = UnionArgParser.Create<Args>().Parse(ignoreUnrecognized = true, raiseOnUsage = false)
 
         let createOutput = results |> getTemplateName
+                           >>= Utils.checkTemplateExists
                            >>= TemplateParser.parse
                            >>= Processor.processTemplate TemplateParser.parse
                            >>= OutputGenerator.generate (getTemplateParameters results)

@@ -196,4 +196,5 @@ FakesAssemblies/
 *.opt
 
 .paket/paket.exe
+.fake
 merge/

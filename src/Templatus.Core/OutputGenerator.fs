@@ -56,15 +56,15 @@ module OutputGenerator =
         List.append assemblyReferences toEval
 
     let generate templateParameters processedTemplate =
-        let sbOut = StringBuilder ()
-        let sbErr = StringBuilder ()
-
-        let cfg = FsiEvaluationSession.GetDefaultConfiguration()
-        let fsi = FsiEvaluationSession.Create(cfg, [|"--noninteractive"|], new StringReader (""), new StringWriter (sbOut), new StringWriter (sbErr))
-
         match processedTemplate.OutputFile with
-        | None -> fail "No output file specified."
+        | None -> fail "Template specifies no output file -- missing output directive."
         | Some f ->
+            let sbOut = StringBuilder ()
+            let sbErr = StringBuilder ()
+
+            let cfg = FsiEvaluationSession.GetDefaultConfiguration()
+            let fsi = FsiEvaluationSession.Create(cfg, [|"--noninteractive"|], new StringReader (""), new StringWriter (sbOut), new StringWriter (sbErr))
+
             prep f templateParameters |> List.iter fsi.EvalInteraction
 
             let preparedTemplate = prepareTemplateForEval processedTemplate |> List.toArray
@@ -78,6 +78,6 @@ module OutputGenerator =
 
             finish |> List.iter fsi.EvalInteraction
 
-            if !lastExpr = Array.length preparedTemplate
+            if !lastExpr = preparedTemplate.Length
             then pass ()
             else sprintf "Expression: %s\n\n%s\n" preparedTemplate.[!lastExpr] (sbErr |> trimFsiErrors) |> fail
