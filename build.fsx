@@ -8,7 +8,6 @@ open ReleaseNotesHelper
 
 let commitHash = Information.getCurrentSHA1 (".")
 let release = LoadReleaseNotes "RELEASE_NOTES.md"
-let authors = [ "kerams" ]
 let description = "T4-like templating tool with support for F#"
 
 let buildDir = "bin"
@@ -76,6 +75,15 @@ Target "PublishNuget" (fun _ ->
             WorkingDir = nugetDir })
 )
 
+Target "Release" (fun _ ->
+    StageAll ""
+    Commit "" (sprintf "Release version %s" release.NugetVersion)
+    Branches.push ""
+
+    Branches.tag "" release.NugetVersion
+    Branches.pushTag "" "origin" release.NugetVersion
+)
+
 "Clean"
     ==> "SetAssemblyInfo"
     ==> "Build"
@@ -83,5 +91,6 @@ Target "PublishNuget" (fun _ ->
     ==> "Default"
     =?> ("CreateNuget", not isLinux)
     =?> ("PublishNuget", not isLinux)
+    ==> "Release"
 
 RunTargetOrDefault "Default"
