@@ -53,7 +53,7 @@ Target "Merge" (fun _ ->
     let result =
         ExecProcess
             (fun info -> info.FileName <- currentDirectory @@ "packages" @@ "ILRepack" @@ "tools" @@ "ILRepack.exe"
-                         info.Arguments <- sprintf "/verbose /attr:%s /lib:%s /out:%s %s" (currentDirectory @@ "bin" @@ "Templatus.exe") buildDir (mergeDir @@ "Templatus.exe") toPack)
+                         info.Arguments <- sprintf "/attr:%s /lib:%s /out:%s %s" (currentDirectory @@ "bin" @@ "Templatus.exe") buildDir (mergeDir @@ "Templatus.exe") toPack)
             (TimeSpan.FromMinutes 5.)
 
     if result <> 0 then failwith "Error during ILRepack execution."
