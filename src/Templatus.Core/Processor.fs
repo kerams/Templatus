@@ -1,6 +1,7 @@
 ﻿namespace Templatus.Core
 
 open Chessie.ErrorHandling
+open System.IO
 
 module Processor =
     type DirectiveGrouping = {
@@ -26,6 +27,7 @@ module Processor =
     let processTemplate parser parsedTemplate =
         let rec processTemplateInner parsedTemplate =
             let directives = extractDirectives parsedTemplate.ParsedTemplateParts
+            let workingDir = Path.GetDirectoryName parsedTemplate.Name
 
             let nonDirectiveParts = 
                 parsedTemplate.ParsedTemplateParts
@@ -38,7 +40,7 @@ module Processor =
                 |> List.map (fun p -> match p with
                                       | ParsedLiteral l -> ProcessedLiteral l |> pass
                                       | ParsedControl c -> ProcessedControl c |> pass
-                                      | ParsedDirective (Include i) -> i |> Utils.checkTemplateExists >>= parser >>= processTemplateInner >>= (ProcessedInclude >> pass)
+                                      | ParsedDirective (Include i) -> Path.Combine [|workingDir; i|] |> Utils.checkTemplateExists >>= parser >>= processTemplateInner >>= (ProcessedInclude >> pass)
                                       | _ -> failwith "Non-iclude directives sneaked in.")
 
             let failures =
@@ -50,7 +52,7 @@ module Processor =
             match failures.Length with
             | 0 ->
                 { Name = parsedTemplate.Name;
-                  AssemblyReferences = directives.AssemblyReferences;
+                  AssemblyReferences = directives.AssemblyReferences |> List.map (fun r -> Path.Combine [|workingDir; r|]);
                   OutputFile = directives.OutputFile;
                   ProcessedTemplateParts = processedParts |> List.choose (fun p -> match p with Ok (r, _) -> Some r | _ -> None) }
                 |> pass

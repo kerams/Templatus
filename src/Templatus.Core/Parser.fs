@@ -43,8 +43,9 @@ module TemplateParser =
 
     let parse file =
         match runParserOnFile pTemplate "" file Text.UTF8Encoding.UTF8 with
-        | Success (parsed, _, _) -> pass { ParsedTemplateParts = parsed; Name = IO.Path.GetFileName file }
+        | Success (parsed, _, _) -> pass { ParsedTemplateParts = parsed; Name = file }
         | Failure (reason, _, _) -> reason.Split ([| "\r\n"; "\n" |], StringSplitOptions.RemoveEmptyEntries)
-                                    |> Array.toList
-                                    |> fun l -> sprintf "Template %s: " (IO.Path.GetFileName file) :: l
+                                    |> List.ofArray
+                                    |> List.map ((+) "| ")
+                                    |> fun l -> sprintf "Template %s: " file :: l
                                     |> Bad

@@ -1,12 +1,12 @@
 ﻿<#@ output filename="output.txt" #>
-<#@ assembly name="..\tests\TestLib.dll" #>
+<#@ assembly name="TestLib.dll" #>
 Time: <#= DateTime.Now #>
 Number from TestLib: <#= TestLib.Test.Number () #>
 \"
 
 Params: <#= sprintf "Name: %s, Age: %s" name age #>
 
-<#@ include file="..\tests\include.txt" #>
+<#@ include file="sub\include.txt" #>
 Indented numbers:
 <#
     [1 .. 10]
