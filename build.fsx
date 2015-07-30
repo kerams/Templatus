@@ -5,6 +5,7 @@ open Fake.Git
 open Fake.AssemblyInfoFile
 open System
 open ReleaseNotesHelper
+open Fake.FileSystemHelper
 
 let commitHash = Information.getCurrentSHA1 (".")
 let release = LoadReleaseNotes "RELEASE_NOTES.md"
@@ -46,7 +47,7 @@ Target "Merge" (fun _ ->
     CreateDir mergeDir
 
     let toPack =
-        [ "Templatus.exe"; "Templatus.Core.dll"; "UnionArgParser.dll"; "Chessie.dll"; "FSharp.Compiler.Service.dll"; "FParsec.dll"; "FParsecCS.dll" ]
+        [ "Templatus.exe"; "Templatus.Core.dll"; "UnionArgParser.dll"; "Chessie.dll"; "FSharp.Compiler.Service.dll"; "FParsec.dll"; "FParsecCS.dll"; ]
         |> List.map (fun l -> buildDir @@ l)
         |> separated " "
 
@@ -55,6 +56,10 @@ Target "Merge" (fun _ ->
             (fun info -> info.FileName <- currentDirectory @@ "packages" @@ "ILRepack" @@ "tools" @@ "ILRepack.exe"
                          info.Arguments <- sprintf "/attr:%s /lib:%s /out:%s %s" (currentDirectory @@ "bin" @@ "Templatus.exe") buildDir (mergeDir @@ "Templatus.exe") toPack)
             (TimeSpan.FromMinutes 5.)
+
+    [ "FSharp.Core.dll"; "FSharp.Core.optdata"; "FSharp.Core.sigdata" ]
+    |> List.map (fun l -> buildDir @@ l)
+    |> CopyFiles mergeDir
 
     if result <> 0 then failwith "Error during ILRepack execution."
 )

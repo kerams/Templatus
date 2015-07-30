@@ -17,3 +17,6 @@ tags
     template, F#, tool, metaprogramming
 files
     ../merge/Templatus.exe ==> tools
+    ../merge/FSharp.Core.dll ==> tools
+    ../merge/FSharp.Core.optdata ==> tools
+    ../merge/FSharp.Core.sigdata ==> tools
