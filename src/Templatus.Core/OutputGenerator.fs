@@ -68,16 +68,11 @@ module OutputGenerator =
             prep f templateParameters |> List.iter fsi.EvalInteraction
 
             let preparedTemplate = prepareTemplateForEval processedTemplate |> List.toArray
-            let lastExpr = ref 0;
 
-            try
-                preparedTemplate
-                |> Array.iter (fun x -> x |> fsi.EvalInteraction
-                                        incr lastExpr)
-            with _ -> failed |> List.iter fsi.EvalInteraction
+            let lastExpr = Utils.countSuccessfulOperations fsi.EvalInteraction preparedTemplate
 
             finish |> List.iter fsi.EvalInteraction
 
-            if !lastExpr = preparedTemplate.Length
+            if lastExpr = preparedTemplate.Length
             then pass ()
-            else sprintf "Expression: %s\n\n%s\n" preparedTemplate.[!lastExpr] (sbErr |> trimFsiErrors) |> fail
+            else sprintf "Expression: %s\n\n%s\n" preparedTemplate.[lastExpr] (sbErr |> trimFsiErrors) |> fail
