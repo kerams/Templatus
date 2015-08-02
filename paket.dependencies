@@ -8,3 +8,4 @@ nuget fsharp.compiler.service
 nuget fsharp.core
 nuget ilrepack
 nuget unionargparser
+nuget unquote
