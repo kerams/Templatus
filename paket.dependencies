@@ -9,3 +9,4 @@ nuget fsharp.core
 nuget ilrepack
 nuget unionargparser
 nuget unquote
+nuget xunit
