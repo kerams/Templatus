@@ -198,4 +198,3 @@ FakesAssemblies/
 .paket/paket.exe
 .fake
 merge/
-test/

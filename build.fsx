@@ -18,7 +18,7 @@ let nugetDir = "nuget"
 let solution = "Templatus.sln"
 
 Target "Clean" (fun _ ->
-    CleanDirs [ buildDir; mergeDir; ]
+    CleanDirs [ buildDir; mergeDir ]
 )
 
 Target "SetAssemblyInfo" (fun _ ->
