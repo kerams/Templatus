@@ -9,13 +9,13 @@ module TemplateParser =
         charsTillString str skipString System.Int32.MaxValue
 
     let pAssemblyReference: Parser<Directive, string> =
-        skipString "assembly" >>. spaces1 >>. skipString "name=\"" >>. maxCharsTillString "\"" true |>> AssemblyReference
+        skipStringCI "assembly" >>. spaces1 >>. skipStringCI "name=\"" >>. maxCharsTillString "\"" true |>> AssemblyReference
 
     let pInclude: Parser<Directive, string> =
-        skipString "include" >>. spaces1 >>. skipString "file=\"" >>. maxCharsTillString "\"" true |>> Include
+        skipStringCI "include" >>. spaces1 >>. skipStringCI "file=\"" >>. maxCharsTillString "\"" true |>> Include
 
     let pOutput: Parser<Directive, string> =
-        skipString "output" >>. spaces1 >>. skipString "filename=\"" >>. maxCharsTillString "\"" true |>> Output
+        skipStringCI "output" >>. spaces1 >>. skipStringCI "filename=\"" >>. maxCharsTillString "\"" true |>> Output
 
     let pAnyDirective: Parser<Directive, string> =
         choice [ pAssemblyReference; pInclude; pOutput ]
