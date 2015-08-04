@@ -10,3 +10,4 @@ nuget ilrepack
 nuget unionargparser
 nuget unquote
 nuget xunit
+nuget xunit.runner.console

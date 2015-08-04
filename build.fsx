@@ -6,6 +6,7 @@ open Fake.AssemblyInfoFile
 open System
 open ReleaseNotesHelper
 open Fake.FileSystemHelper
+open Fake.Testing.XUnit2
 
 let commitHash = Information.getCurrentSHA1 (".")
 let release = LoadReleaseNotes "RELEASE_NOTES.md"
@@ -17,7 +18,7 @@ let nugetDir = "nuget"
 let solution = "Templatus.sln"
 
 Target "Clean" (fun _ ->
-    CleanDirs [ buildDir; mergeDir ]
+    CleanDirs [ buildDir; mergeDir; ]
 )
 
 Target "SetAssemblyInfo" (fun _ ->
@@ -41,6 +42,11 @@ Target "Build" (fun _ ->
     !! solution
     |> MSBuildRelease "" "Rebuild"
     |> ignore
+)
+
+Target "Test" (fun _ ->
+    !! (buildDir @@ "*.Tests.dll")
+    |> xUnit2 (fun p -> { p with ToolPath = currentDirectory @@ "packages" @@ "xunit.runner.console" @@ "tools" @@ "xunit.console.exe" })
 )
 
 Target "Merge" (fun _ ->
@@ -92,6 +98,7 @@ Target "Release" (fun _ ->
 "Clean"
     ==> "SetAssemblyInfo"
     ==> "Build"
+    ==> "Test"
     ==> "Merge"
     ==> "Default"
     =?> ("CreateNuget", not isLinux)
