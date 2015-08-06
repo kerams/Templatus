@@ -17,8 +17,10 @@ module OutputGenerator =
             "let popIndent () = _indent := match !_indent with [] -> [] | _ :: t -> t"
             "let clearIndent () = _indent := []"
             "let _output = new IO.StreamWriter \"" + outputFileName + "\""
-            "let tprintf o = sprintf \"%O\" o |> _output.Write"
-            "let tprintfn o = sprintf \"%s%O\" (_indentStr ()) o |> _output.WriteLine" ]
+            "let tprint o = sprintf \"%O\" o |> _output.Write"
+            "let tprintn o = sprintf \"%s%O\" (_indentStr ()) o |> _output.WriteLine"
+            "let tprintf format = fprintf _output format"
+            "let tprintfn format = Printf.kprintf (fprintfn _output \"%s%s\" (_indentStr ())) format" ]
 
         let parameters = templateParameters |> List.map (fun (name, value) -> sprintf "let %s = \"%s\"" name value)
 
@@ -26,11 +28,11 @@ module OutputGenerator =
 
     let private finish = [ "_output.Close ()" ]
 
-    let private failed = [ "sprintf \"%s---FAILED---\" Environment.NewLine |> tprintf" ]
+    let private failed = [ "tprintf \"%s---FAILED---\" Environment.NewLine" ]
 
     let private prepareControl = function
         | ControlBlock block -> block.Replace("\t", "    ") // FSI complains about tabs
-        | ControlExpression expr -> expr.Replace("\t", "    ") |> sprintf "%s |> tprintf"
+        | ControlExpression expr -> expr.Replace("\t", "    ") |> sprintf "%s |> tprint"
 
     let private newlineRegex = new Regex (@"\r\n|\n\r|\n|\r", RegexOptions.Compiled)
 
@@ -40,7 +42,7 @@ module OutputGenerator =
 
     let private prepareLiteral text =
         newlineRegex.Replace(text, Environment.NewLine).Replace("\"", "\"\"")
-        |> sprintf "tprintf @\"%s\""
+        |> sprintf "tprint @\"%s\""
 
     let rec private prepareTemplateForEval processedTemplate =
         let assemblyReferences = processedTemplate.AssemblyReferences |> List.map (sprintf "#r @\"%s\"")
