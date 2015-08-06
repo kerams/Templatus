@@ -18,16 +18,25 @@ Template parsing is implemented using the excellent library [FParsec](http://www
 - Template nesting
 
 ## Getting started
-Templates comprise 3 parts:
+### Template parts
 - Directives - delimited by `<#@` and `#>`
-  - Output directive `<#@ output filename="..\gen\output.txt" #>` - specifies the file to generate
-  - Include directive `<#@ include file="sub\include.ttus" #>` - specifies a nested template whose output will be embedded in place of the directive
-  - Assembly reference directive `<#@ assembly name="TestLib.dll" #>` - specifies an assembly (either in GAC or local to the template) to reference
+  - Output directive `<#@ output filename="..\gen\output.txt" #>` - Specifies the file to generate
+  - Include directive `<#@ include file="sub\include.ttus" #>` - Specifies a nested template whose output will be embedded in place of the directive
+  - Assembly reference directive `<#@ assembly name="TestLib.dll" #>` - Specifies an assembly (either in GAC or local to the template) to reference
 - Controls
-  - Expression `<#= DateTime.Now #>` - expressions that are evaluated, converted to string (using the `%O` format specifier) and printed out
-  - Block `<# [1..2] |> List.iter tprintn #>` - contain arbitrary logic (including function/module declarations that will be available in any control from that point onwards) and can use any of the `tprint` functions to print into the output file
+  - Expression `<#= DateTime.Now #>` - Expressions that are evaluated, converted to string (using the `%O` format specifier) and printed out
+  - Block `<# [1..2] |> List.iter tprintn #>` - Contains arbitrary logic (including function/module declarations that will be available in any control from that point onwards) and can use any of the `tprint` functions to print into the output file
 - Literals
   - Any text that is neither a directive nor a control
-  - Printed out into the output "as is"
+  - Printed into the output "as is"
 
 *Note*: Bodies of any control are whitespace-sensitive just like regular F# code, meaning you have to abide by F#'s whitespace rules. Also, tabs are automatically converted to 4 spaces.
+
+### Convenience functions
+- `tprint` - Takes any object and after calling ToString on it prints the result into the output
+- `tprintn` - The same as above but with a trailing newline
+- `tprintf` - The `sprintf` equivalent for printing into the output
+- `tprintfn` - The same as above but with a trailing newline
+- `pushIndent` - Takes a string and puts it on the stack of indent strings. The indent strings are used as a prefix for everything that `tprintn` and `tprintfn` output.
+- `popIndent` - Removes a string from the top of the stack of indent strings. Does not throw an exception when the stack is empty.
+- `clearIndent` - Clears the entire stack of indent strings
