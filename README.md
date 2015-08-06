@@ -40,3 +40,8 @@ Template parsing is implemented using the excellent library [FParsec](http://www
 - `pushIndent` - Takes a string and puts it on the stack of indent strings. The indent strings are used as a prefix for everything that `tprintn` and `tprintfn` output.
 - `popIndent` - Removes a string from the top of the stack of indent strings. Does not throw an exception when the stack is empty.
 - `clearIndent` - Clears the entire stack of indent strings
+
+### Template processor
+Templatus.exe is a command-line template processor that takes a template and an optional list of arguments to make accessible in the template. The following flags are available:
+- `-t ..\..\myTemplate.ttus` - Specifies the template to be processed
+- `-p name=Timmy;age=3` - Defines `name` and `age` variables that you can directly refer to in the template. Note that the variables are always defined as strings.
