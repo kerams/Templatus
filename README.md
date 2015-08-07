@@ -1,4 +1,4 @@
-# Templatus
+﻿# Templatus
 [![Build Status](https://magnum.travis-ci.com/kerams/Templatus.svg?token=MzTGNBqs9peqx7A5xToB&branch=master)](https://magnum.travis-ci.com/kerams/Templatus)
 
 ## What?
@@ -45,3 +45,81 @@ Template parsing is implemented using the excellent library [FParsec](http://www
 Templatus.exe is a command-line template processor that takes a template and an optional list of arguments to make accessible in the template. The following flags are available:
 - `-t ..\..\myTemplate.ttus` - Specifies the template to be processed
 - `-p name=Timmy;age=3` - Defines `name` and `age` variables that you can directly refer to in the template. Note that the variables are always defined as strings.
+
+### Example
+Suppose I have a folder structure like this:
+
+    MySolutionDir
+    │ MySolutionFile.sln
+    │
+    ├─lib
+    │   TestLib.dll
+    │
+    ├─MyProjectDir
+    │   include.ttus
+    │   testTemplate.ttus
+    │
+    └─packages
+        └─Templatus
+            └─tools
+                Templatus.exe
+
+The contents of `testTemplate.ttus`:
+
+    <#@ output filename="output.txt" #>
+    <#@ assembly name="..\lib\TestLib.dll" #>
+    Number from TestLib: <#= TestLib.Test.Number () #>
+
+    Params: <#= sprintf "Name: %s, Age: %s" name age #>
+
+    <#@ include file="include.ttus" #>
+    Indented numbers:
+    <#
+        [1 .. 10]
+        |> Seq.iter (fun num -> pushIndent " "; tprintfn "%d" num)
+
+	    [9 .. -1 .. 1]
+        |> Seq.iter (fun num -> popIndent (); sprintf "%d" num |> tprintn)
+
+        clearIndent ()
+        tprintn "----"
+    #>
+
+And the template being included:
+
+    A line in include
+    Time in include: <#= DateTime.Now #>
+
+To generate the output file, I just need to execute `Templatus.exe` and pass in `testTemplate.ttus`:
+
+    D:\MySolutionDir> packages\Templatus\tools\Templatus.exe -t MyProjectDir\testTemplate.ttus -p name=Timmy;age=3
+
+`output.txt` is created and looks like this:
+
+    Number from TestLib: 5
+
+    Params: Name: Timmy, Age: 3
+
+    A line in include
+    Time in include: 07-Aug-15 10:14:56
+    Indented numbers:
+     1
+      2
+       3
+        4
+         5
+          6
+           7
+            8
+             9
+              10
+             9
+            8
+           7
+          6
+         5
+        4
+       3
+      2
+     1
+    ----
