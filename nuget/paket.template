@@ -14,9 +14,10 @@ summary
 licenseurl https://github.com/kerams/Templatus/blob/master/LICENSE
 projecturl https://github.com/kerams/Templatus
 tags
-    template, F#, tool, metaprogramming
+    template, F#, tool, metaprogramming, code generation
 files
     ../merge/Templatus.exe ==> tools
     ../merge/FSharp.Core.dll ==> tools
     ../merge/FSharp.Core.optdata ==> tools
     ../merge/FSharp.Core.sigdata ==> tools
+    ../merge/Templatus.exe.config ==> tools
