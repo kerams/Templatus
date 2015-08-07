@@ -9,14 +9,14 @@ module Processor =
         AssemblyReferences: string list
         Includes: string list }
 
-    let extractDirectives parsedTemplateParts =
+    let extractDirectives workingDir parsedTemplateParts =
         let rec extract rest directiveGrouping =
             match rest with
             | [] -> directiveGrouping
             | h :: t -> 
                 let newGrouping = match h with
                                   | Include file -> { directiveGrouping with Includes = file :: directiveGrouping.Includes }
-                                  | Output file -> { directiveGrouping with OutputFile = Some file }
+                                  | Output file -> { directiveGrouping with OutputFile = Path.Combine [|workingDir; file|] |> Some }
                                   | AssemblyReference assembly -> { directiveGrouping with AssemblyReferences = assembly :: directiveGrouping.AssemblyReferences }
                 extract t newGrouping
         
@@ -25,9 +25,9 @@ module Processor =
         extract directives { OutputFile = None; AssemblyReferences = []; Includes = [] }
 
     let processTemplate parser parsedTemplate =
-        let rec processTemplateInner parsedTemplate =
-            let directives = extractDirectives parsedTemplate.ParsedTemplateParts
+        let rec processTemplateInner (parsedTemplate: ParsedTemplate) =
             let workingDir = Path.GetDirectoryName parsedTemplate.Name
+            let directives = extractDirectives workingDir parsedTemplate.ParsedTemplateParts
 
             let nonDirectiveParts = 
                 parsedTemplate.ParsedTemplateParts
