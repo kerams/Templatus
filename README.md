@@ -18,6 +18,9 @@ Template parsing is implemented using the excellent library [FParsec](http://www
 - Referencing assemblies
 - Template nesting
 
+## Installation?
+You can get Templatus as a Nuget package https://www.nuget.org/packages/Templatus/. It resides in the `tools` folder under `packages\Templatus`.
+
 ## Getting started
 ### Template parts
 - Directives - delimited by `<#@` and `#>`
