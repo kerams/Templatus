@@ -8,7 +8,7 @@ open Chessie.ErrorHandling
 open Microsoft.FSharp.Compiler.Interactive.Shell
 
 module OutputGenerator =
-    let private prep outputFileName templateParameters =
+    let private prep (outputFileName: string) templateParameters =
         let basis = [
             "open System"
             "let _indent: string list ref = ref []"
@@ -16,7 +16,7 @@ module OutputGenerator =
             "let pushIndent str = _indent := str :: !_indent"
             "let popIndent () = _indent := match !_indent with [] -> [] | _ :: t -> t"
             "let clearIndent () = _indent := []"
-            "let _output = new IO.StreamWriter \"" + outputFileName + "\""
+            "let _output = new IO.StreamWriter \"" + outputFileName.Replace(@"\", @"\\") + "\""
             "let tprint o = sprintf \"%O\" o |> _output.Write"
             "let tprintn o = sprintf \"%s%O\" (_indentStr ()) o |> _output.WriteLine"
             "let tprintf format = fprintf _output format"
