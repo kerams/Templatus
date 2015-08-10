@@ -1,5 +1,5 @@
 ﻿# Templatus
-[![Build Status](https://magnum.travis-ci.com/kerams/Templatus.svg?token=MzTGNBqs9peqx7A5xToB&branch=master)](https://magnum.travis-ci.com/kerams/Templatus)
+[![Build Status](https://travis-ci.org/kerams/Templatus.svg)](https://travis-ci.org/kerams/Templatus)
 [![Build status](https://ci.appveyor.com/api/projects/status/trjc0x6f9b8m77tr?svg=true)](https://ci.appveyor.com/project/kerams/templatus)
 
 ## What?
