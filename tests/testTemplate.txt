@@ -1,4 +1,4 @@
-﻿<#@ output filename="output.txt" #>
+﻿<#@ output filename=".\output.txt" #>
 <#@ assembly name="TestLib.dll" #>
 Time: <#= DateTime.Now #>
 Number from TestLib: <#= TestLib.Test.Number () #>

@@ -59,7 +59,7 @@ module OutputGenerator =
 
     let generate templateParameters processedTemplate =
         match processedTemplate.OutputFile with
-        | None -> fail "Template specifies no output file -- missing output directive."
+        | None -> sprintf "Template %s specifies no output file -- missing output directive." processedTemplate.Name |> fail
         | Some f ->
             let sbOut = StringBuilder ()
             let sbErr = StringBuilder ()

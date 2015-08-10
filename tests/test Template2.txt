@@ -1,0 +1,3 @@
+<#@ output filename="output2.txt" #>
+<#@ assembly name="TestLib.dll" #>
+'sup

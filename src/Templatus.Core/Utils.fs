@@ -4,8 +4,16 @@ open System.IO
 open Chessie.ErrorHandling
 
 module Utils =
-    let checkTemplateExists templateName =
-        if File.Exists templateName then pass templateName else sprintf "Cannot find template %s." templateName |> fail
+    let checkTemplatesExist templateNames =
+        let inexistent = templateNames
+                         |> List.filter (not << File.Exists)
+
+        match inexistent with
+        | [] -> pass templateNames
+        | _ -> inexistent
+               |> String.concat ", "
+               |> sprintf "Cannot find templates %s."
+               |> fail
 
     let countSuccessfulOperations f input =
         let last = Array.length input
