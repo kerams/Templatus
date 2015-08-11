@@ -6,7 +6,7 @@ Number from TestLib: <#= TestLib.Test.Number () #>
 
 Params: <#= sprintf "Name: %s, Age: %s" name age #>
 
-<#@ include file="sub\include.txt" #>
+<#@ include file="sub\include.ttus" #>
 Indented numbers:
 <#
     [1 .. 10]

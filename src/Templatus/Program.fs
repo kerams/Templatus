@@ -36,18 +36,19 @@ module Main =
         | Some n -> if n < 1 then 1 else n
         | None -> 1
 
-    open Chessie.ErrorHandling.AsyncExtensions
-
     [<EntryPoint>]
     let main _ =
         let results = UnionArgParser.Create<Args>().Parse(ignoreUnrecognized = true, raiseOnUsage = false)
         let parameters = getTemplateParameters results
         let parallelism = getDegreeOfParallelism results
 
-        let processChunk list = async {
-            return list |> List.map TemplateParser.parse
-                   |> List.map (bind (Processor.processTemplate TemplateParser.parse))
-                   |> List.map (bind (OutputGenerator.generate parameters)) }
+        let processChunk list = list |> List.map TemplateParser.parse
+                                |> List.map (bind (Processor.processTemplate TemplateParser.parse))
+                                |> List.map (bind (OutputGenerator.generate parameters))
+                                |> Async.singleton
+                   
+        printfn "Degree of parallelism: %d" parallelism
+        printfn "Starting..."
 
         let createOutput = results |> getTemplateNames
                            >>= Utils.checkTemplatesExist
@@ -58,5 +59,5 @@ module Main =
                            >>= collect
 
         match createOutput with
-        | Ok _ -> 0
+        | Ok _ -> printfn "All templates processed successfully."; 0
         | Bad reasons -> reasons |> List.iter (eprintfn "%s"); 1
