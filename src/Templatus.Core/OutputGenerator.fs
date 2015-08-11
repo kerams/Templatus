@@ -61,11 +61,11 @@ module OutputGenerator =
         match processedTemplate.OutputFile with
         | None -> sprintf "Template %s specifies no output file -- missing output directive." processedTemplate.Name |> fail
         | Some f ->
-            let sbOut = StringBuilder ()
-            let sbErr = StringBuilder ()
+            use out = new StringWriter ()
+            use err = new StringWriter ()
 
-            let cfg = FsiEvaluationSession.GetDefaultConfiguration()
-            let fsi = FsiEvaluationSession.Create(cfg, [|"--noninteractive"|], new StringReader (""), new StringWriter (sbOut), new StringWriter (sbErr))
+            let cfg = FsiEvaluationSession.GetDefaultConfiguration ()
+            use fsi = FsiEvaluationSession.Create (cfg, [|"--noninteractive"|], new StringReader (""), out, err)
 
             prep f templateParameters |> List.iter fsi.EvalInteraction
 
@@ -77,4 +77,4 @@ module OutputGenerator =
 
             if lastExpr = preparedTemplate.Length
             then pass ()
-            else sprintf "Expression: %s\n\n%s\n" preparedTemplate.[lastExpr] (sbErr |> trimFsiErrors) |> fail
+            else sprintf "Expression: %s\n\n%s\n" preparedTemplate.[lastExpr] (err |> trimFsiErrors) |> fail
