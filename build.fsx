@@ -19,6 +19,9 @@ let solution = "Templatus.sln"
 
 Target "Clean" (fun _ ->
     CleanDirs [ buildDir; mergeDir ]
+
+    !! (nugetDir @@ "*.nupkg")
+    |> DeleteFiles
 )
 
 Target "SetAssemblyInfo" (fun _ ->
