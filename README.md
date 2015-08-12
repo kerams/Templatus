@@ -47,7 +47,7 @@ You can get Templatus as a Nuget package https://www.nuget.org/packages/Templatu
 
 ### Template processor
 Templatus.exe is a command-line template processor that takes a template and an optional list of arguments to make accessible in the template. The following flags are available:
-- `-t ..\..\myTemplate.ttus` - Specifies the template to be processed
+- `-t ..\..\myTemplate.ttus` - Specifies the template to be processed. You can also specify more templates by using `-t [path]` repeatedly. All of them share the variables that you pass in.
 - `-p name=Timmy;age=3` - Defines `name` and `age` variables that you can directly refer to in the template. Note that the variables are always defined as strings.
 
 ### Example
