@@ -1,6 +1,7 @@
 ﻿# Templatus
 [![Build Status](https://travis-ci.org/kerams/Templatus.svg)](https://travis-ci.org/kerams/Templatus)
 [![Build status](https://ci.appveyor.com/api/projects/status/trjc0x6f9b8m77tr?svg=true)](https://ci.appveyor.com/project/kerams/templatus)
+[![NuGet package](https://img.shields.io/nuget/v/Templatus.svg)](https://www.nuget.org/packages/Templatus/)
 
 ## What?
 Templatus is a templating tool that works (and currently also looks) a lot like T4. The major difference is the fact that blocks that emit text are written in F# instead of C#.
