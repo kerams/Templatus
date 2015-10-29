@@ -128,3 +128,14 @@ To generate the output file, I just need to execute `Templatus.exe` and pass in 
       2
      1
     ----
+
+### Sample MsBuild 4 target (added to your MyProjectDir.fsproj or MyProjectDir.csproj)
+```
+  <PropertyGroup>
+    <PackagesFolder>$([System.IO.Path]::GetFullPath('$(MSBuildProjectDirectory)\..\packages'))</PackagesFolder>
+  </PropertyGroup>
+  <Target Name="Templates" BeforeTargets="Compile;Build" Inputs="Template.ttus" Outputs="output.txt">
+    
+    <Exec Command="$(PackagesFolder)\Templatus.0.2.0\tools\Templatus.exe -t &quot;$(MSBuildProjectDirectory)\Template.ttus&quot; -p name=Timmy;age=3" Outputs="output.txt" />
+  </Target>
+```
