@@ -46,7 +46,7 @@ module Processor =
                                           >>= (List.head >> parser)
                                           >>= processTemplateInner
                                           >>= (ProcessedInclude >> pass)
-                                      | _ -> failwith "Non-iclude directives sneaked in.")
+                                      | _ -> failwith "Non-include directives sneaked in.")
 
             let failures =
                 processedParts
