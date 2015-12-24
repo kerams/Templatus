@@ -56,7 +56,7 @@ Target "Merge" (fun _ ->
     CreateDir mergeDir
 
     let toPack =
-        [ "Templatus.exe"; "Templatus.Core.dll"; "UnionArgParser.dll"; "Chessie.dll"; "FSharp.Compiler.Service.dll"; "FParsec.dll"; "FParsecCS.dll"; ]
+        [ "Templatus.exe"; "Templatus.Core.dll"; "Argu.dll"; "Chessie.dll"; "FSharp.Compiler.Service.dll"; "FParsec.dll"; "FParsecCS.dll"; ]
         |> List.map (fun l -> buildDir @@ l)
         |> separated " "
 
