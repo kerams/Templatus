@@ -3,7 +3,7 @@
 open System
 open Templatus.Core
 open Chessie.ErrorHandling
-open Nessos.UnionArgParser
+open Nessos.Argu
 
 type Args =
     | [<CustomCommandLine("-t")>] Templates of string
@@ -18,12 +18,12 @@ with
             | Parallelization _ -> "degree of parallelism of template processing"
 
 module Main =
-    let getTemplateNames (parsedArgs: ArgParseResults<Args>) =
+    let getTemplateNames (parsedArgs: ParseResults<Args>) =
         match parsedArgs.GetResults <@ Templates @> with
         | [] -> parsedArgs.Usage (message = "No templates provided.\nUsage:") |> fail
         | list -> pass list
 
-    let getTemplateParameters (parsedArgs: ArgParseResults<Args>) =
+    let getTemplateParameters (parsedArgs: ParseResults<Args>) =
         match parsedArgs.TryGetResult <@ TemplateParameters @> with
         | Some parameters -> parameters.Split ';'
                              |> List.ofArray
@@ -31,14 +31,14 @@ module Main =
                              |> List.choose (fun ps -> if ps.Length <> 2 then None else Some (ps.[0], ps.[1]))
         | None -> []
 
-    let getDegreeOfParallelism (parsedArgs: ArgParseResults<Args>) =
+    let getDegreeOfParallelism (parsedArgs: ParseResults<Args>) =
         match parsedArgs.TryGetResult <@ Parallelization @> with
         | Some n -> if n < 1 then 1 else n
         | None -> 1
 
     [<EntryPoint>]
     let main _ =
-        let results = UnionArgParser.Create<Args>().Parse(ignoreUnrecognized = true, raiseOnUsage = false)
+        let results = ArgumentParser.Create<Args>().Parse(ignoreUnrecognized = true, raiseOnUsage = false)
         let parameters = getTemplateParameters results
         let parallelism = getDegreeOfParallelism results
 
