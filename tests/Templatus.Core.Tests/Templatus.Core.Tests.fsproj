@@ -9,7 +9,7 @@
     <OutputType>Library</OutputType>
     <RootNamespace>Templatus.Core.Tests</RootNamespace>
     <AssemblyName>Templatus.Core.Tests</AssemblyName>
-    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <TargetFSharpCoreVersion>4.4.0.0</TargetFSharpCoreVersion>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Name>Templatus.Core.Tests</Name>
