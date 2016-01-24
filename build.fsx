@@ -98,8 +98,12 @@ Target "Release" (fun _ ->
     Branches.pushTag "" "origin" release.NugetVersion
 )
 
+let releasing =
+    [ "CreateNuget"; "PublishNuget"; "Release" ]
+    |> List.exists (getBuildParam "target" |> (=))
+
 "Clean"
-    ==> "SetAssemblyInfo"
+    =?> ("SetAssemblyInfo", releasing)
     ==> "Build"
     ==> "Test"
     ==> "Merge"
