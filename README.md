@@ -48,8 +48,9 @@ You can get Templatus as a Nuget package https://www.nuget.org/packages/Templatu
 
 ### Template processor
 Templatus.exe is a command-line template processor that takes a template and an optional list of arguments to make accessible in the template. The following flags are available:
-- `-t ..\..\myTemplate.ttus` - Specifies the template to be processed. You can also specify more templates by using `-t [path]` repeatedly. All of them share the variables that you pass in.
-- `-p name=Timmy;age=3` - Defines `name` and `age` variables that you can directly refer to in the template. Note that the variables are always defined as strings.
+- `-t "..\..\myTemplate.ttus;anotherTemplate.ttus"` - Specifies the templates to be processed. All of them share the variables that you pass in.
+- `-parallelization 2` - The maximum number of templates processed in parallel.
+- `-p name=Timmy age=3` - Defines `name` and `age` variables that you can directly refer to in the template. Note that the variables are always defined as strings. `-p` also has to be the last flag used.
 
 ### Example
 Suppose I have a folder structure like this:
@@ -97,7 +98,7 @@ And the template being included:
 
 To generate the output file, I just need to execute `Templatus.exe` and pass in `testTemplate.ttus`:
 
-    D:\MySolutionDir> packages\Templatus\tools\Templatus.exe -t MyProjectDir\testTemplate.ttus -p name=Timmy;age=3
+    D:\MySolutionDir> packages\Templatus\tools\Templatus.exe -t MyProjectDir\testTemplate.ttus -p name=Timmy age=3
 
 `output.txt` is created and looks like this:
 
@@ -136,6 +137,6 @@ To generate the output file, I just need to execute `Templatus.exe` and pass in 
   </PropertyGroup>
   <Target Name="Templates" BeforeTargets="Compile;Build" Inputs="Template.ttus" Outputs="output.txt">
     
-    <Exec Command="$(PackagesFolder)\Templatus.0.2.0\tools\Templatus.exe -t &quot;$(MSBuildProjectDirectory)\Template.ttus&quot; -p name=Timmy;age=3" Outputs="output.txt" />
+    <Exec Command="$(PackagesFolder)\Templatus\tools\Templatus.exe -t &quot;$(MSBuildProjectDirectory)\Template.ttus&quot; -p name=Timmy age=3" Outputs="output.txt" />
   </Target>
 ```

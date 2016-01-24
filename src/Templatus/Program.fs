@@ -5,20 +5,20 @@ open Chessie.ErrorHandling
 open Argu
 
 type Args =
-    | [<CustomCommandLine("-t")>] Template of string
+    | [<CustomCommandLine("-t")>] Templates of string
     | [<CustomCommandLine("-p")>][<Rest>] TemplateParameters of string
     | [<CustomCommandLine("-parallelization")>] Parallelization of int
 with
     interface IArgParserTemplate with
         member s.Usage =
             match s with
-            | Template _ -> "path to the template to process"
-            | TemplateParameters _ -> "parameters to pass in the templates, i.e. --params age=3;name=Timmy"
-            | Parallelization _ -> "degree of parallelism of template processing"
+            | Templates _ -> "path to the templates to process"
+            | TemplateParameters _ -> "parameters to pass into the templates, i.e. -p age=3 name=Timmy"
+            | Parallelization _ -> "the maximum number of templates processed in parallel"
 
 module Main =
     let getTemplateNames (parsedArgs: ParseResults<Args>) =
-        match parsedArgs.TryGetResult <@ Template @> with
+        match parsedArgs.TryGetResult <@ Templates @> with
         | Some t -> t.Split ';' |> List.ofArray |> pass
         | None -> parsedArgs.Usage (message = "No templates provided.\nUsage:") |> fail
 
