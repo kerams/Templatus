@@ -27,7 +27,7 @@
     <DocumentationFile>
     </DocumentationFile>
     <Prefer32Bit>true</Prefer32Bit>
-    <StartArguments>-t "..\tests\testTemplate.ttus" -t "..\tests\test Template2.ttus" -p age=2;name=Timmy -parallelization 2</StartArguments>
+    <StartArguments>-t "..\tests\testTemplate.ttus;..\tests\test Template2.ttus" -parallelization 2 -p age=2 name=Timmy</StartArguments>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
