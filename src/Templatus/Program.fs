@@ -1,9 +1,8 @@
 ﻿namespace Templatus
 
-open System
 open Templatus.Core
 open Chessie.ErrorHandling
-open Nessos.Argu
+open Argu
 
 type Args =
     | [<CustomCommandLine("-t")>] Templates of string
@@ -42,10 +41,10 @@ module Main =
         let parameters = getTemplateParameters results
         let parallelism = getDegreeOfParallelism results
 
-        let processChunk list = list |> List.map TemplateParser.parse
-                                |> List.map (bind (Processor.processTemplate TemplateParser.parse))
-                                |> List.map (bind (OutputGenerator.generate parameters))
-                                |> Async.singleton
+        let processList = List.map TemplateParser.parse
+                          >> List.map (bind (Processor.processTemplate TemplateParser.parse))
+                          >> List.map (bind (OutputGenerator.generate parameters))
+                          >> Async.singleton
                    
         printfn "Degree of parallelism: %d" parallelism
         printfn "Starting..."
@@ -53,7 +52,7 @@ module Main =
         let createOutput = results |> getTemplateNames
                            >>= Utils.checkTemplatesExist
                            |> lift (List.splitInto parallelism)
-                           |> lift (List.map processChunk)
+                           |> lift (List.map processList)
                            |> lift (Async.Parallel >> Async.RunSynchronously)
                            |> lift (List.ofArray >> List.concat)
                            >>= collect
