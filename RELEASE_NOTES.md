@@ -1,3 +1,7 @@
+#### 0.3.0 - 24.1.2016
+* Changes in CLI syntax
+* Updated dependencies
+
 #### 0.2.1 - 24.12.2015
 * Removed a hard dependency on MSBuild 12.0 by updating FSharp.Compiler.Service
 
