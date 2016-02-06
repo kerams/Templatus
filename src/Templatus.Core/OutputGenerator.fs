@@ -22,8 +22,9 @@ module OutputGenerator =
             """let tprintf format = Printf.kprintf (sprintf "%s%s" _indentStr >> _output.Append >> ignore) format"""
             """let tprintfn format = Printf.kprintf (sprintf "%s%s" _indentStr >> _output.AppendLine >> ignore) format""" ]
 
-        let parameters = templateParameters |> List.map (fun (name, value) -> sprintf """let %s = "%s" """ name value)
-        List.append basis parameters
+        templateParameters
+        |> List.map (fun (name, value) -> sprintf """let %s = "%s" """ name value)
+        |> (@) basis
 
     let private finish (outputFileName: string) =
         [ "IO.File.WriteAllText(\"" + outputFileName.Replace(@"\", @"\\") + "\", _output.ToString ())" ]
@@ -45,15 +46,13 @@ module OutputGenerator =
     let rec private prepareTemplateForEval processedTemplate =
         let assemblyReferences = processedTemplate.AssemblyReferences |> List.map (sprintf """#r @"%s" """)
 
-        let toEval =
-            processedTemplate.ProcessedTemplateParts
-            |> List.map (fun p -> match p with
-                                  | ProcessedLiteral (Literal l) -> [prepareLiteral l]
-                                  | ProcessedControl c -> [prepareControl c]
-                                  | ProcessedInclude i -> prepareTemplateForEval i)
-            |> List.concat
-
-        List.append assemblyReferences toEval
+        processedTemplate.ProcessedTemplateParts
+        |> List.map (fun p -> match p with
+                              | ProcessedLiteral (Literal l) -> [prepareLiteral l]
+                              | ProcessedControl c -> [prepareControl c]
+                              | ProcessedInclude i -> prepareTemplateForEval i)
+        |> List.concat
+        |> (@) assemblyReferences
 
     let generate templateParameters processedTemplate =
         match processedTemplate.OutputFile with

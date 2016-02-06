@@ -56,9 +56,9 @@ module Processor =
 
             match failures.Length with
             | 0 ->
-                { Name = parsedTemplate.Name;
-                  AssemblyReferences = directives.AssemblyReferences |> List.map (fun r -> Path.Combine (workingDir, r));
-                  OutputFile = directives.OutputFile |> Option.map (fun file -> Path.Combine (workingDir, file));
+                { Name = parsedTemplate.Name
+                  AssemblyReferences = directives.AssemblyReferences |> List.map (fun r -> Path.Combine (workingDir, r))
+                  OutputFile = directives.OutputFile |> Option.map (fun file -> Path.Combine (workingDir, file))
                   ProcessedTemplateParts = processedParts |> List.choose (fun p -> match p with Ok (r, _) -> Some r | _ -> None) }
                 |> pass
             | _ -> sprintf "Template %s: " parsedTemplate.Name :: failures |> Bad
