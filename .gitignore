@@ -198,4 +198,4 @@ FakesAssemblies/
 .paket/paket.exe
 .fake
 merge/
-output.txt
+output*.txt
