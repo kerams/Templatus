@@ -24,7 +24,7 @@ module Main =
 
     let getTemplateParameters (parsedArgs: ParseResults<Args>) =
         parsedArgs.GetResults <@ TemplateParameters @>
-        |> List.map (fun p -> p.Split '=')
+        |> List.map (fun p -> p.Split([|'='|], 2))
         |> List.choose (fun ps -> if ps.Length <> 2 then None else Some (ps.[0], ps.[1]))
 
     let getDegreeOfParallelism (parsedArgs: ParseResults<Args>) =
