@@ -1,3 +1,6 @@
+#### 0.3.1 - 21.1.2018
+* Updated dependencies
+
 #### 0.3.0 - 24.1.2016
 * Changes in CLI syntax
 * Updated dependencies
