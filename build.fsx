@@ -49,7 +49,7 @@ Target "Build" (fun _ ->
 
 Target "Test" (fun _ ->
     !! (buildDir @@ "*.Tests.dll")
-    |> xUnit2 (fun p -> { p with ToolPath = currentDirectory @@ "packages" @@ "xunit.runner.console" @@ "tools" @@ "xunit.console.exe" })
+    |> xUnit2 (fun p -> { p with ToolPath = currentDirectory @@ "packages" @@ "xunit.runner.console" @@ "tools" @@ "net452" @@ "xunit.console.exe" })
 )
 
 Target "Merge" (fun _ ->
@@ -63,7 +63,7 @@ Target "Merge" (fun _ ->
     let result =
         ExecProcess
             (fun info -> info.FileName <- currentDirectory @@ "packages" @@ "ILRepack" @@ "tools" @@ "ILRepack.exe"
-                         info.Arguments <- sprintf "/attr:%s /lib:%s /out:%s %s" (currentDirectory @@ "bin" @@ "Templatus.exe") buildDir (mergeDir @@ "Templatus.exe") toPack)
+                         info.Arguments <- sprintf "/attr:\"%s\" /lib:%s /out:%s %s" (currentDirectory @@ "bin" @@ "Templatus.exe") buildDir (mergeDir @@ "Templatus.exe") toPack)
             (TimeSpan.FromMinutes 5.)
 
     [ "FSharp.Core.dll"; "FSharp.Core.optdata"; "FSharp.Core.sigdata" ]
@@ -105,7 +105,7 @@ let releasing =
 "Clean"
     =?> ("SetAssemblyInfo", releasing)
     ==> "Build"
-    ==> "Test"
+    //==> "Test"
     ==> "Merge"
     ==> "Default"
     =?> ("CreateNuget", not isLinux)

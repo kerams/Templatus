@@ -199,3 +199,4 @@ FakesAssemblies/
 .fake
 merge/
 output*.txt
+paket-files

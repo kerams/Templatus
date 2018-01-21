@@ -1,7 +1,7 @@
 redirects: on
 source https://nuget.org/api/v2
 
-nuget argu
+nuget argu ~> 2.1
 nuget FAKE
 nuget chessie
 nuget fparsec
